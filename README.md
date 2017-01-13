@@ -1,2 +1,2 @@
 # BoomerRang
-Call back service for baby boomers on the go
+Call back service for baby boomers on the go.
