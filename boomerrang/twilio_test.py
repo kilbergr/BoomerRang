@@ -27,10 +27,12 @@ class MessageClient(object):
                                               twilio_auth_token)
 
     def send_message(self, body, to):
-        self.twilio_client.messages.create(body=body, to=to,
+    	if to != None:
+        	self.twilio_client.messages.create(body=body, to=to,
                                            from_=self.twilio_number,
                                            media_url=['https://demo.twilio.com/owl.png']
                                            )
+
 
 def get_args():
 	parser = argparse.ArgumentParser()
@@ -41,7 +43,7 @@ def main():
 	args = get_args()
 
 	message_client = MessageClient()
-	num_to_send = args.dest_number[0] if args.dest_number else '(555) 555-5555'
+	num_to_send = args.dest_number[0] if args.dest_number else None
 	message_client.send_message("Hello, this is a test message.", num_to_send)
 
 if __name__=='__main__':
