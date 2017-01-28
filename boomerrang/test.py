@@ -41,7 +41,7 @@ def main():
 	args = get_args()
 
 	message_client = MessageClient()
-	num_to_send = args.dest_number[0] if args.dest_number else '(510) 289-4755'
+	num_to_send = args.dest_number[0] if args.dest_number else '(555) 555-5555'
 	message_client.send_message("Hello, this is a test message.", num_to_send)
 
 if __name__=='__main__':
