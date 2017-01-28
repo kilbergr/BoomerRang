@@ -30,7 +30,7 @@ class MessageClient(object):
     	if to != None:
         	self.twilio_client.messages.create(body=body, to=to,
                                            from_=self.twilio_number,
-                                           media_url=['https://demo.twilio.com/owl.png']
+                                           #media_url=['https://demo.twilio.com/owl.png']
                                            )
 
 
