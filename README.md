@@ -18,7 +18,7 @@ Call back service for baby boomers on the go.
 
 3. In psql shell, create role that corresponds to app:
  `CREATE ROLE admin WITH LOGIN PASSWORD 'trussadmin';`  
- likely also want to create a superuser role:
+ likely also want to create a superuser role--currently have one 'truss':
  `python manage.py createsuperuser`
 
 
