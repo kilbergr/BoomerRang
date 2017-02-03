@@ -16,8 +16,10 @@ Call back service for baby boomers on the go.
 	* If you can't connect to your psql shell (`error: psql: FATAL:  database "username" does not exist`), use the following command in your shell to create your default db with the following command: `/usr/local/bin/createdb <username>`
 	* 	Once connected, create db in psql shell: CREATE DATABASE boomerang_db;
 
-3. In psql shell, create role that corresponds to app: # todo: figure out what this is for...
- `CREATE ROLE admin WITH LOGIN PASSWORD 'truss';`
+3. In psql shell, create role that corresponds to app:
+ `CREATE ROLE admin WITH LOGIN PASSWORD 'trussadmin';`  
+ likely also want to create a superuser role:
+ `python manage.py createsuperuser`
 
 
 ## Running the app:
