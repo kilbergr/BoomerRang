@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'boomerrang_app.apps.BoomerrangAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -78,7 +79,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'boomerrang_db',
         'USER': 'admin',
-        'PASSWORD': 'truss',
+        'PASSWORD': 'trussadmin',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
