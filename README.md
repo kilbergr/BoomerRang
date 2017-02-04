@@ -4,8 +4,8 @@ Call back service for baby boomers on the go.
 # PythonToDo:
 
 ## Setup:
- 1. In your root directory, install python version 3.4.0 with `pyenv install 3.5.0`.
- 2. Set the python version of your newly-created virtual environment to 3.5.0 with pyenv: `pyenv local 3.4.0`.
+ 1. In your root directory, install python version 3.5.0 with `pyenv install 3.5.0`.
+ 2. Set the python version of your newly-created virtual environment to 3.5.0 with pyenv: `pyenv local 3.5.0`.
  3. Clone this repo via `git clone https://github.com/trussworks/BoomerRang`. (Set remotes according to: http://truss.works/blog/2014/12/31/a-lightweight-resilient-git-workflow-for-small-teams)
  4. To install requirements, run `pip install -r requirements.txt`.
 
