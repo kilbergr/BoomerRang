@@ -12,5 +12,5 @@ database:
     - echo "GRANT ALL PRIVILEGES ON DATABASE boomerang_db TO admin;" | psql -U postgres
     - echo "GRANT CREATE, CONNECT ON DATABASE boomerang_db TO admin;" | psql -U postgres
 test:
-  post:
-    - echo "yes"
+  override:
+    - python manage.py test
