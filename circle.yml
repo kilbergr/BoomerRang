@@ -6,7 +6,11 @@ machine:
 database:
   override:
     # replace CircleCI's generated database.yml
-    - createdb boomerang_db
     - echo "CREATE ROLE admin WITH LOGIN PASSWORD 'trussadmin';" | psql -U postgres
+    - echo "ALTER USER admin CREATEDB;"
+    - createdb boomerang_db
     - echo "GRANT ALL PRIVILEGES ON DATABASE boomerang_db TO admin;" | psql -U postgres
     - echo "GRANT CREATE, CONNECT ON DATABASE boomerang_db TO admin;" | psql -U postgres
+test:
+  post:
+    - echo "yes"
