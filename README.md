@@ -1,8 +1,6 @@
 # BoomerRang
 Call back service for baby boomers on the go.
 
-# PythonToDo:
-
 ## Setup:
  1. In your root directory, install python version 3.5.0 with `pyenv install 3.5.0`.
  2. Set the python version of your newly-created virtual environment to 3.5.0 with pyenv: `pyenv local 3.5.0`.

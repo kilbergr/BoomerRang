@@ -1,0 +1,12 @@
+## Include postgresql
+machine:
+  services:
+    - postgresql
+## Customize database setup
+database:
+  override:
+    # replace CircleCI's generated database.yml
+    - createdb boomerang_db
+    - echo "CREATE ROLE admin WITH LOGIN PASSWORD 'trussadmin';" | psql -U postgres
+    - echo "GRANT SELECT, UPDATE, INSERT ON ALL TABLES IN SCHEMA boomerang_db.public TO admin;" | psql -U postgres
+    - echo "GRANT CREATE, CONNECT ON DATABASE boomerang_db TO admin;" | psql -U postgres
