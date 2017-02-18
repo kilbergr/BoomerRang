@@ -10,9 +10,9 @@ BoomerRang is an API that advocacy organizations can use to connect citizens wit
  2. Clone this repo via `git clone https://github.com/trussworks/BoomerRang`. 
  3. Create a virtualenv and install requirements:
  	* `pyenv virtualenv <my_virtual_env> && pyenv activate <my_virtual_env>'
- 	* Set the python version of your newly-created virtual environment to 3.5.0 with pyenv: 
+ 4. Set the python version of your newly-created virtual environment to 3.5.0 with pyenv: 
  		`pyenv local 3.5.0`.
- 4. Install requirements: `pip install -r requirements.txt`.
+ 5. Install requirements: `pip install -r requirements.txt`.
 
 ## Postgres setup:
 
@@ -20,7 +20,7 @@ BoomerRang is an API that advocacy organizations can use to connect citizens wit
 2. Open psql shell via `psql`.
 	* If you can't connect to your psql shell (`error: psql: FATAL:  database "username" does not exist`), use the following command in your shell to create your default db with the following command: 
 	`/usr/local/bin/createdb <username>`
-	* 	Once connected, create db in psql shell: `CREATE DATABASE boomerrang_db;`
+	* Once connected, create db in psql shell: `CREATE DATABASE boomerrang_db;`
 
 3. In psql shell, create role that corresponds to app:
 
