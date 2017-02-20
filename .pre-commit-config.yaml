@@ -1,0 +1,22 @@
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    sha: v0.7.0
+    hooks:
+        # Trims trailing whitespace
+    -   id: trailing-whitespace
+        # Ensures files end in newline character
+    -   id: end-of-file-fixer
+        # Auto-formats python code
+    -   id: autopep8-wrapper
+        # Prevent large (>500kb default) files from being committed
+    -   id: check-added-large-files
+        # Checks basic yaml syntax
+    -   id: check-yaml
+        # Checks for debug statements in code
+    -   id: debug-statements
+        # Makes sure django test files in tests/ are names properly
+    -   id: name-tests-test
+        args: ['--django']
+        # Makes sure entries are sorted
+    -   id: requirements-txt-fixer
+        # Runs flake8 over python code
+    -   id: flake8
