@@ -37,7 +37,7 @@ BoomerRang is an API that advocacy organizations can use to connect citizens wit
 
 The app requires environment variables to be set with your Twilio account keys and number.
 
-To set environment variables locally, run:
+## To set environment variables locally, run:
 
 ```export TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxx
 export TWILIO_AUTH_TOKEN=yyyyyyyyyyyyyyyyy
