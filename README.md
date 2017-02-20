@@ -43,6 +43,8 @@ The app requires environment variables to be set with your Twilio account keys a
 export TWILIO_AUTH_TOKEN=yyyyyyyyyyyyyyyyy
 export TWILIO_NUMBER=+15556667777```
 
+TODO: @Andie: Figure out how we're going to deal with key-setting - git ignore? local_settings file? Temporary solution is to set these in your bash profile.
+
 ## Running the app:
 
 1. To manually start the postgres server, run `pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start`.
