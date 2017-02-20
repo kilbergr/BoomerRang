@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'boomerrang_app.apps.BoomerrangAppConfig',
+    'boomerrang.boomerrang_app.apps.BoomerrangAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

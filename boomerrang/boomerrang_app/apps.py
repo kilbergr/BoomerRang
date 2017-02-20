@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class BoomerrangAppConfig(AppConfig):
-    name = 'boomerrang_app'
+    name = 'boomerrang.boomerrang_app'
