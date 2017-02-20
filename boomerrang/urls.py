@@ -18,5 +18,5 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^users/', include('boomerrang.boomerrang_app.urls'))
+    url(r'^call/', include('boomerrang.boomerrang_app.urls'))
 ]
