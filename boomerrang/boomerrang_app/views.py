@@ -9,7 +9,7 @@ from twilio import twiml
 from twilio.rest import Client
 
 from boomerrang.boomerrang_app.forms import BoomForm
-# from boomerrang.boomerrang_app.models import CallRequest, Org, Call
+from boomerrang.boomerrang_app.models import CallRequest, Org, Call
 
 
 def load_twilio_config():
@@ -24,6 +24,7 @@ def load_twilio_config():
 
 
 def index(request):
+<<<<<<< HEAD
     form = BoomForm()
     return render(request, 'form_test.html', {'form': form})
 
@@ -32,16 +33,19 @@ def index(request):
 def call(request):
     (twilio_number, twilio_account_sid, twilio_auth_token) = load_twilio_config()
     import ipdb; ipdb.set_trace()
+    # Instantiate form
+    form = BoomForm(request.POST or None, initial={'source_num': '+11234567891'})
+
     if request.method == 'POST':
         # Load our Twilio credentials
         (twilio_number, twilio_account_sid, twilio_auth_token) = load_twilio_config()
 
-        # Get phone number we need to call
-        form = BoomForm(request.POST)
-
-        # Check for form validity, if form valid
+        # If form valid, clean data and place call
         if form.is_valid():
-            phone_number = form.cleaned_data['']
+            import pdb; pdb.set_trace()
+            phone_num_obj = form.cleaned_data['source_num']
+            source_num = '+{}{}'.format(phone_num_obj.country_code, phone_num_obj.national_number)
+
             try:
                 twilio_client = Client(twilio_account_sid, twilio_auth_token)
             except Exception as e:
@@ -50,19 +54,18 @@ def call(request):
 
             try:
                 twilio_client.calls.create(from_=twilio_number,
-                                           to=phone_number,
-                                           url='outbound',
-                                           _external=True)
+                                           to=source_num,
+                                           url='outbound')
             except Exception as e:
-                app.logger.error(e)
+                # app.logger.error(e)
+                print(e)
                 return redirect(request, 'index')
 
             return messages.success(request, 'Call incoming!')
         else:
             messages.error(request, 'Invalid entry')
             return redirect('index')
-    elif request.method == 'GET':
-        return render(request, 'index.html')
+    return render(request, 'index.html', {'form': form})
 
 
 def outbound(request):
