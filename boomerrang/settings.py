@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'phonenumber_field',
 ]
 
 MIDDLEWARE = [
@@ -123,3 +124,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Set format to what twilio uses 
+PHONENUMBER_DB_FORMAT = 'E164'
