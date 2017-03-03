@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
-# Create your views here.
+from boomerrang.boomerrang_app.models import CallRequest, Org, Call
 
 
 def index(request):
