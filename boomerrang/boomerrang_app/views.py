@@ -1,8 +1,9 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 
-from boomerrang.boomerrang_app.models import CallRequest, Org, Call
+from boomerrang.boomerrang_app.forms import BoomForm
+# from boomerrang.boomerrang_app.models import CallRequest, Org, Call
 
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the users index.")
+    form = BoomForm()
+    return render(request, 'form_test.html', {'form': form})
