@@ -1,10 +1,12 @@
+from django.contrib import messages
 from django.core.exceptions import MiddlewareNotUsed
 from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.shortcuts import render
 
+import os
 from twilio import twiml
 from twilio.rest import Client
-import os
 
 from boomerrang.boomerrang_app.forms import BoomForm
 # from boomerrang.boomerrang_app.models import CallRequest, Org, Call
@@ -18,7 +20,6 @@ def load_twilio_config():
     if not all([twilio_account_sid, twilio_auth_token, twilio_number]):
         print('Twilio auth info not configured.')
         raise MiddlewareNotUsed
-    import ipdb; ipdb.set_trace()
     return (twilio_number, twilio_account_sid, twilio_auth_token)
 
 
@@ -32,35 +33,39 @@ def call(request):
     (twilio_number, twilio_account_sid, twilio_auth_token) = load_twilio_config()
     import ipdb; ipdb.set_trace()
     if request.method == 'POST':
-        import pdb; pdb.set_trace()
+        # Load our Twilio credentials
+        (twilio_number, twilio_account_sid, twilio_auth_token) = load_twilio_config()
+
         # Get phone number we need to call
-        phone_number = request.form.get('phoneNumber', None)
-        import ipdb; ipdb.set_trace()
+        form = BoomForm(request.POST)
 
-        try:
-            twilio_client = Client(twilio_account_sid, twilio_auth_token)
-        except Exception as e:
-            msg = 'Missing configuration variable: {0}'.format(e)
-            return jsonify({'error': msg})
+        # Check for form validity, if form valid
+        if form.is_valid():
+            phone_number = form.cleaned_data['']
+            try:
+                twilio_client = Client(twilio_account_sid, twilio_auth_token)
+            except Exception as e:
+                msg = 'Missing configuration variable: {0}'.format(e)
+                messages.error(request, msg)
 
-        try:
-            import ipdb; ipdb.set_trace()
-            twilio_client.calls.create(from_=twilio_number,
-                                       to=phone_number,
-                                       url='outbound',
-                                       _external=True)
-        except Exception as e:
-            app.logger.error(e)
-            return jsonify({'error': str(e)})
+            try:
+                twilio_client.calls.create(from_=twilio_number,
+                                           to=phone_number,
+                                           url='outbound',
+                                           _external=True)
+            except Exception as e:
+                app.logger.error(e)
+                return redirect(request, 'index')
 
-        return jsonify({'message': 'Call incoming!'})
-    else:
-        import pdb; pdb.set_trace()
-        return redirect('index.html')
+            return messages.success(request, 'Call incoming!')
+        else:
+            messages.error(request, 'Invalid entry')
+            return redirect('index')
+    elif request.method == 'GET':
+        return render(request, 'index.html')
 
 
 def outbound(request):
-    import ipdb; ipdb.set_trace()
     if request.method == 'POST':
         response = twiml.Response()
 

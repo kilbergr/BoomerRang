@@ -11,12 +11,20 @@
   </head>
   <body>
     <div class="container">
-        <hr>
-
         <!-- C2C contact form-->
         <div class="row">
             <div class="col-md-12">
-                <form id="contactForm" role="form" action="/call/" method="post">
+               {% if messages %}
+                  <ul class="messages">
+                      {% for message in messages %}
+                      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                          {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+                          {{ message }}
+                      </li>
+                      {% endfor %}
+                  </ul>
+                {% endif %}
+                <form id="contactForm" role="form" action="/" method="post">
                   {% csrf_token %}
                     <div class="form-group">
                         <h3>Call Your Leader</h3>
@@ -26,7 +34,7 @@
                     </div>
                     <div class="form-group">
                         <input type="text" id="phoneNumber" 
-                            placeholder="(651) 555-7889" class="form-control">
+                            placeholder="(212) 123-4567" class="form-control">
                     </div>
                     <input type="submit" class="btn btn-default" value="Contact"/>
                 </form>
