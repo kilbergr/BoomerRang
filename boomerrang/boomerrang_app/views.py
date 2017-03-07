@@ -42,7 +42,6 @@ def call(request):
 
         # If form valid, clean data and place call
         if form.is_valid():
-            import pdb; pdb.set_trace()
             phone_num_obj = form.cleaned_data['source_num']
             source_num = '+{}{}'.format(phone_num_obj.country_code, phone_num_obj.national_number)
 
@@ -55,13 +54,15 @@ def call(request):
             try:
                 twilio_client.calls.create(from_=twilio_number,
                                            to=source_num,
-                                           url='outbound')
+                                           url='http://7220b59f.ngrok.io/outbound/')
+
             except Exception as e:
                 # app.logger.error(e)
                 print(e)
-                return redirect(request, 'index')
+                return redirect('index')
 
-            return messages.success(request, 'Call incoming!')
+            messages.success(request, 'Call incoming!')
+            return redirect('outbound')
         else:
             messages.error(request, 'Invalid entry')
             return redirect('index')
@@ -69,13 +70,18 @@ def call(request):
 
 
 def outbound(request):
-    if request.method == 'POST':
+    try:
         response = twiml.Response()
-
-        # response.say("Thank you for contacting Boomerrang. If this "
-        #              "were in production, we'd dial your intended target.",
-        #              voice='alice')
-
+        response.say("Thank you for contacting Boomerrang. If this "
+                     "were in production, we'd dial your intended target.",
+                     voice='alice')
+        import ipdb; ipdb.set_trace()
         with response.dial() as dial:
             dial.number("+15102894755")
-        return str(response)
+
+    except Exception as e:
+        # app.logger.error(e)
+        print(e)
+        return redirect('index')
+
+    return str(response)
