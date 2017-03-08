@@ -18,9 +18,8 @@ BoomerRang is an API that advocacy organizations can use to connect citizens wit
 	* `pyenv local 3.5.0`.
  4. Create a virtualenv and install requirements:
 	* `pyenv virtualenv <my_virtual_env> && pyenv activate <my_virtual_env>`
- 5. Update pip: `pip install --upgrade pip`
- 6. Install requirements: `pip install -r requirements.txt`.
- 7. Activate [pre-commit](http://pre-commit.com/) hooks by running `pre-commit install`.
+ 5. Install requirements: `pip install -r requirements.txt`.
+ 6. Activate [pre-commit](http://pre-commit.com/) hooks by running `pre-commit install`.
 
 ## Postgres setup:
 
