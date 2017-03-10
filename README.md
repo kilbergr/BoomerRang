@@ -41,9 +41,9 @@ The app requires environment variables to be set with your Twilio account keys a
 
 ## To set environment variables locally, run:
 
-	```export TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxx   
+	export TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxx   
 	export TWILIO_AUTH_TOKEN=yyyyyyyyyyyyyyyyy    
-	export TWILIO_NUMBER=+15556667777```
+	export TWILIO_NUMBER=+15556667777
 
 TODO: @Andie: Figure out how we're going to deal with key-setting - git ignore? local_settings file? Temporary solution is to set these in your bash profile.
 
