@@ -24,7 +24,6 @@ def load_twilio_config():
 
 
 def index(request):
-<<<<<<< HEAD
     form = BoomForm()
     return render(request, 'form_test.html', {'form': form})
 
