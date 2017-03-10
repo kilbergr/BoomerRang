@@ -46,9 +46,10 @@ def index(request):
             try:
                 twilio_client.calls.create(from_=twilio_number,
                                            to=source_num,
-                                           url='http://7220b59f.ngrok.io/outbound/')
+                                           url='http://0ba12056.ngrok.io/outbound/')
 
             except Exception as e:
+                # TODO (rebecca): Set up logging
                 # app.logger.error(e)
                 print(e)
                 return redirect('index')
@@ -73,6 +74,7 @@ def outbound(request):
             dial.number("+15102894755")
 
     except Exception as e:
+        # TODO (rebecca): Set up logging
         # app.logger.error(e)
         print(e)
         return redirect('index')
