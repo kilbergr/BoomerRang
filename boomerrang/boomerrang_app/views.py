@@ -3,6 +3,7 @@ from django.core.exceptions import MiddlewareNotUsed
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 
 import os
 from twilio import twiml
@@ -24,14 +25,6 @@ def load_twilio_config():
 
 
 def index(request):
-    form = BoomForm()
-    return render(request, 'form_test.html', {'form': form})
-
-
-# Voice Request URL
-def call(request):
-    (twilio_number, twilio_account_sid, twilio_auth_token) = load_twilio_config()
-    import ipdb; ipdb.set_trace()
     # Instantiate form
     form = BoomForm(request.POST or None, initial={'source_num': '+11234567891'})
 
@@ -68,13 +61,14 @@ def call(request):
     return render(request, 'index.html', {'form': form})
 
 
+@csrf_exempt
 def outbound(request):
     try:
         response = twiml.Response()
-        response.say("Thank you for contacting Boomerrang. If this "
-                     "were in production, we'd dial your intended target.",
+        response.say("Thank you for contacting Boomerrang. You are being connected "
+                     "to your representative, Bob.",
                      voice='alice')
-        import ipdb; ipdb.set_trace()
+
         with response.dial() as dial:
             dial.number("+15102894755")
 
@@ -83,4 +77,4 @@ def outbound(request):
         print(e)
         return redirect('index')
 
-    return str(response)
+    return HttpResponse(response)

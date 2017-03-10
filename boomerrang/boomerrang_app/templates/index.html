@@ -26,21 +26,21 @@
                 {% endif %}
                 <form id="contactForm" role="form" action="/" method="post">
                   {% csrf_token %}
-                    <div class="form-group">
+                  <div class="form-group">
                         <h3>Call Your Leader</h3>
                         <p class="help-block">
                             Enter your phone number below, and you'll get a call.
                         </p>
-                    </div>
-                    <div class="form-group">
-                      {{ form }}
-                    </div>
+                  </div>
+                  <div class="form-group">
+                    {{ form }}
                     <input type="submit" class="btn btn-default" value="Contact"/>
+                  </div>
                 </form>
             </div>
         </div>
     </div>
-    <!-- Include page dependencies -->
+    <!-- Add page dependencies below -->
   
   </body>
 </html>
