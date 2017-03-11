@@ -26,7 +26,7 @@ def load_twilio_config():
 
 def index(request):
     # Instantiate form
-    form = BoomForm(request.POST or None, initial={'source_num': '+11234567891'})
+    form = BoomForm(request.POST or None, initial={'source_num': '+15105555555'})
 
     if request.method == 'POST':
         # Load our Twilio credentials
@@ -40,8 +40,9 @@ def index(request):
             try:
                 twilio_client = Client(twilio_account_sid, twilio_auth_token)
             except Exception as e:
-                msg = 'Missing configuration variable: {0}'.format(e)
-                messages.error(request, msg)
+                # TODO (rebecca): Set up logging
+                # app.logger.error(e)
+                print(e)
 
             try:
                 twilio_client.calls.create(from_=twilio_number,
@@ -55,10 +56,8 @@ def index(request):
                 return redirect('index')
 
             messages.success(request, 'Call incoming!')
-            return redirect('outbound')
         else:
             messages.error(request, 'Invalid entry')
-            return redirect('index')
     return render(request, 'index.html', {'form': form})
 
 
@@ -66,9 +65,9 @@ def index(request):
 def outbound(request):
     try:
         response = twiml.Response()
-        response.say("Thank you for contacting Boomerrang. You are being connected "
-                     "to your representative, Bob.",
-                     voice='alice')
+        response.say("Gracias por contactar con Boomerrang. Estamos conectandote con "
+                     "vuestra representativa, Señor Bob.",
+                     voice='alice', language='es-ES')
 
         with response.dial() as dial:
             dial.number("+15102894755")
