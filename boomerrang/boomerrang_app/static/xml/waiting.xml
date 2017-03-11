@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-    <Say voice="woman">Hi there! We'll be connecting you shortly to your representative.</Say>
-    <Dial>+1-510-289-4755</Dial>
-    <Record maxLength="20" />
-</Response>
