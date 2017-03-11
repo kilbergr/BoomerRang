@@ -9,6 +9,7 @@ BoomerRang is an API that advocacy organizations can use to connect citizens wit
  1. [pyenv](https://github.com/yyuu/pyenv#homebrew-on-mac-os-x)
  2. [pyenv virtualenv](https://github.com/yyuu/pyenv-virtualenv#installing-with-homebrew-for-os-x-users)
  3. [postgres](https://www.postgresql.org/download/macosx/): `brew install postgresq`
+ 4. [ngrok](https://ngrok.com/): To install version 2 of ngrok, do NOT use homebrew. Instead, follow instructions from their site. We are using version 2.1.18. Make sure to move the application from wherever you unzip it into `/usr/local/bin/ngrok`.
 
 ## Virtualenv and Repo Setup:
 
@@ -40,9 +41,9 @@ The app requires environment variables to be set with your Twilio account keys a
 
 ## To set environment variables locally, run:
 
-```export TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxx
-export TWILIO_AUTH_TOKEN=yyyyyyyyyyyyyyyyy
-export TWILIO_NUMBER=+15556667777```
+	export TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxx   
+	export TWILIO_AUTH_TOKEN=yyyyyyyyyyyyyyyyy    
+	export TWILIO_NUMBER=+15556667777
 
 TODO: @Andie: Figure out how we're going to deal with key-setting - git ignore? local_settings file? Temporary solution is to set these in your bash profile.
 
@@ -50,7 +51,9 @@ TODO: @Andie: Figure out how we're going to deal with key-setting - git ignore? 
 
 1. To manually start the postgres server, run `pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start`.
 	* Note: to have postgres automatically run at login, run `ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents`.
-2. To run the server, run `python manage.py runserver`
+2. To run ngrok on port 4567, run `ngrok http 4567` in one terminal tab.
+    * Note: ngrok must be running on the same port as django.
+3. To run the server on port 4567, run `python manage.py runserver 4567` in a separate terminal tab.
 	* If you see this: `django.core.exceptions.ImproperlyConfigured: settings.DATABASES is improperly configured. Please supply the ENGINE value. Check settings documentation for more details.`, run this in your terminal:
 	`export DATABASE_URL=postgres://trussel:pwd@127.0.0.1:5432/boomerang_db`. This sets the environmental variable locally that django needs to look to the local postgres database.
-3. Point your browser to: <http://127.0.0.1:8000/users> to see things.
+4. Point your browser to: <http://127.0.0.1:4567> to see things.
