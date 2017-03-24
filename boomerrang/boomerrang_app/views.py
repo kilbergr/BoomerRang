@@ -7,22 +7,12 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
-import os
 from twilio import twiml
 from twilio.rest import Client
 
 from boomerrang.boomerrang_app.forms import BoomForm
-
-
-def load_twilio_config():
-    twilio_account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
-    twilio_auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
-    twilio_number = os.environ.get('TWILIO_NUMBER')
-
-    if not all([twilio_account_sid, twilio_auth_token, twilio_number]):
-        print('Twilio auth info not configured.')
-        raise MiddlewareNotUsed
-    return (twilio_number, twilio_account_sid, twilio_auth_token)
+from boomerrang.boomerrang_app.models import CallRequest, Org, Call
+from boomerrang.boomerrang_app import view_helpers
 
 
 def index(request):
@@ -33,7 +23,7 @@ def index(request):
     if request.method == 'POST':
         # Load our Twilio credentials
         (twilio_number, twilio_account_sid,
-         twilio_auth_token) = load_twilio_config()
+         twilio_auth_token) = view_helpers.load_twilio_config()
 
         # If form valid, clean data and place call
         if form.is_valid():
