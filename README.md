@@ -39,13 +39,11 @@ BoomerRang is an API that advocacy organizations can use to connect citizens wit
 
 The app requires environment variables to be set with your Twilio account keys and number.
 
-## To set environment variables locally, run:
+## To set environment variables locally, create a file called `.env` here, with the following variables set with twilio test account values:
 
-	export TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxx   
-	export TWILIO_AUTH_TOKEN=yyyyyyyyyyyyyyyyy    
-	export TWILIO_NUMBER=+15556667777
-
-TODO: @Andie: Figure out how we're going to deal with key-setting - git ignore? local_settings file? Temporary solution is to set these in your bash profile.
+	TWILIO_ACCOUNT_SID=<TEST_ACCOUNT_SID>
+	TWILIO_AUTH_TOKEN=<TEST_AUTH_TOKEN>
+	TWILIO_NUMBER=<(555) 555-5555>
 
 ## Running the app:
 
