@@ -43,7 +43,7 @@ The app requires environment variables to be set with your Twilio account keys a
 
 	TWILIO_ACCOUNT_SID=<TEST_ACCOUNT_SID>
 	TWILIO_AUTH_TOKEN=<TEST_AUTH_TOKEN>
-	TWILIO_NUMBER=<(555) 555-5555>
+	TWILIO_NUMBER=<+15555555555>
 
 ## Running the app:
 
