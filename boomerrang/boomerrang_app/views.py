@@ -72,7 +72,7 @@ def outbound(request):
         print('hit try loop')
         response = twiml.Response()
         response.say("Gracias por contactar con Boomerrang. Estamos "
-                     "conectandote con vuestra representativa, Señor Bob.",
+                     "conectandote con vuestra representativa, Senor Bob.",
                      voice='alice', language='es-ES')
         print(response)
         with response.dial() as dial:
