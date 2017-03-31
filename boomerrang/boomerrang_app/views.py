@@ -70,6 +70,7 @@ def index(request):
 def outbound(request):
     print('Reached outbound')
     try:
+        print('reached try')
         response = twiml.Response()
         response.say("Gracias por contactar con Boomerrang. Estamos "
                      "conectandote con vuestra representativa, Señor Bob.",
@@ -81,7 +82,7 @@ def outbound(request):
     except Exception as e:
         # TODO (rebecca): Set up logging
         # app.logger.error(e)
-        print(e)
+        print("this is the error: {}".format(e))
         return redirect('index')
 
     return HttpResponse(response)
