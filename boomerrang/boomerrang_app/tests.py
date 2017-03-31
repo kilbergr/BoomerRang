@@ -39,12 +39,21 @@ class ViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('form' in response.context)
 
-  #   def test_load_twilio_config(self):
-		# test_num, test_sid, test_token = view_helpers.load_twilio_config('dev')
-		# prod_num, prod_sid, prod_token = view_helpers.load_twilio_config('prod')
-		# self.assertEqual(test_num, prod_num)
-		# self.assertNotEqual(test_sid, prod_sid)
-		# self.assertNotEqual(test_token, prod_token)
+   # TODO: (Rebecca) Needs views tests that test Twilio
+   #  def test_create_call(self):
+   #  	test_num, test_sid, test_token = view_helpers.load_twilio_config()
+   #  	self.client.calls.create(url="http://demo.twilio.com/docs/voice.xml",
+			# to="+14108675309",
+			# from_="+15005550006")
+   #  	self.assertEqual(CallStatus.Success, client.call.Status);
 
-    def test_
+   #  	response = self.client.post('/', {'form': {'source_num': '+19175263426'}})
 
+
+class ViewHelpersTests(TestCase):
+
+    def test_load_twilio_config(self):
+    	test_num, test_sid, test_token = view_helpers.load_twilio_config()
+    	self.assertEqual(len(test_token), 32)
+    	self.assertEqual(len(test_sid), 34)
+    	self.assertIn('+1', test_num)
