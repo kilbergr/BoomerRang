@@ -49,10 +49,10 @@ def index(request):
                 print(e)
 
             try:
-                twilio_url = 'http://0ba12056.ngrok.io/outbound/'
+                outbound_url = 'http://polar-wave-91710.herokuapp.com/outbound'
                 twilio_client.calls.create(from_=twilio_number,
                                            to=source_num,
-                                           url=twilio_url)
+                                           url=outbound_url)
 
             except Exception as e:
                 # TODO (rebecca): Set up logging
@@ -68,6 +68,7 @@ def index(request):
 
 @csrf_exempt
 def outbound(request):
+    print('Reached outbound')
     try:
         response = twiml.Response()
         response.say("Gracias por contactar con Boomerrang. Estamos "
