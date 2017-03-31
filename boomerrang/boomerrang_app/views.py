@@ -69,20 +69,17 @@ def index(request):
 @csrf_exempt
 def outbound(request):
     try:
-        print('hit try loop')
         response = twiml.Response()
         response.say("Gracias por contactar con Boomerrang. Estamos "
                      "conectandote con vuestra representativa, Senor Bob.",
                      voice='alice', language='es-ES')
-        print(response)
         with response.dial() as dial:
             dial.number("+15102894755")
-            print('dialed now')
 
     except Exception as e:
         # TODO (rebecca): Set up logging
         # app.logger.error(e)
-        print("this is the error: {}".format(e))
+        print(e)
         return redirect('index')
 
     return HttpResponse(response)
