@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.contrib import messages
 from django.core.exceptions import MiddlewareNotUsed
 from django.http import HttpResponse
@@ -10,7 +12,6 @@ from twilio import twiml
 from twilio.rest import Client
 
 from boomerrang.boomerrang_app.forms import BoomForm
-from boomerrang.boomerrang_app.models import CallRequest, Org, Call
 
 
 def load_twilio_config():
@@ -26,16 +27,19 @@ def load_twilio_config():
 
 def index(request):
     # Instantiate form
-    form = BoomForm(request.POST or None, initial={'source_num': '+15105555555'})
+    form = BoomForm(request.POST or None, initial={
+                    'source_num': '+15105555555'})
 
     if request.method == 'POST':
         # Load our Twilio credentials
-        (twilio_number, twilio_account_sid, twilio_auth_token) = load_twilio_config()
+        (twilio_number, twilio_account_sid,
+         twilio_auth_token) = load_twilio_config()
 
         # If form valid, clean data and place call
         if form.is_valid():
             phone_num_obj = form.cleaned_data['source_num']
-            source_num = '+{}{}'.format(phone_num_obj.country_code, phone_num_obj.national_number)
+            source_num = '+{}{}'.format(phone_num_obj.country_code,
+                                        phone_num_obj.national_number)
 
             try:
                 twilio_client = Client(twilio_account_sid, twilio_auth_token)
@@ -45,9 +49,10 @@ def index(request):
                 print(e)
 
             try:
+                twilio_url = 'http://0ba12056.ngrok.io/outbound/'
                 twilio_client.calls.create(from_=twilio_number,
                                            to=source_num,
-                                           url='http://0ba12056.ngrok.io/outbound/')
+                                           url=twilio_url)
 
             except Exception as e:
                 # TODO (rebecca): Set up logging
@@ -65,8 +70,8 @@ def index(request):
 def outbound(request):
     try:
         response = twiml.Response()
-        response.say("Gracias por contactar con Boomerrang. Estamos conectandote con "
-                     "vuestra representativa, Señor Bob.",
+        response.say("Gracias por contactar con Boomerrang. Estamos "
+                     "conectandote con vuestra representativa, Señor Bob.",
                      voice='alice', language='es-ES')
 
         with response.dial() as dial:
