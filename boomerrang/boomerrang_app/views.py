@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-
 from django.contrib import messages
 from django.core.exceptions import MiddlewareNotUsed
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+import logging
 
 from twilio import twiml
 from twilio.rest import Client
@@ -14,6 +14,9 @@ from boomerrang.boomerrang_app.forms import BoomForm
 from boomerrang.boomerrang_app.models import CallRequest, Org, Call
 from boomerrang.boomerrang_app import view_helpers
 
+# Setup logging
+log = logging.getLogger()
+view_helpers.setup_logging(log)
 
 def index(request):
     # Instantiate form
@@ -34,9 +37,7 @@ def index(request):
             try:
                 twilio_client = Client(twilio_account_sid, twilio_auth_token)
             except Exception as e:
-                # TODO (rebecca): Set up logging
-                # app.logger.error(e)
-                print(e)
+                log.error(e)
 
             try:
                 outbound_url = 'http://polar-wave-91710.herokuapp.com/outbound/'
@@ -45,12 +46,11 @@ def index(request):
                                            url=outbound_url)
 
             except Exception as e:
-                # TODO (rebecca): Set up logging
-                # app.logger.error(e)
-                print(e)
+                log.error('Call unable to be initiated to source: {}, {}'.format(source_num, e))
                 return redirect('index')
 
             messages.success(request, 'Call incoming!')
+            log.info('Call initiated to source - {}'.format(source_num))
         else:
             messages.error(request, 'Invalid entry')
     return render(request, 'index.html', {'form': form})
@@ -63,13 +63,15 @@ def outbound(request):
         response.say("Gracias por contactar con Boomerrang. Estamos "
                      "conectandote con vuestra representativa, Senor Bob.",
                      voice='alice', language='es-ES')
+        log.info('Automated message delivered to source number.')
         with response.dial() as dial:
-            dial.number("+15102894755")
+            target_num = "+15102894755"
+            dial.number(target_num)
 
     except Exception as e:
-        # TODO (rebecca): Set up logging
-        # app.logger.error(e)
-        print(e)
+        log.error('Call unable to connect to target: {}'.format(target_num))
         return redirect('index')
+
+    log.info('Call from {} to {} successful!'.format(source_num, target_num))
 
     return HttpResponse(response)
