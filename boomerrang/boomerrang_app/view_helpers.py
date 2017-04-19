@@ -10,15 +10,3 @@ def load_twilio_config():
         print('Twilio auth info not configured.')
         raise MiddlewareNotUsed
     return (twilio_number, twilio_account_sid, twilio_auth_token)
-
-
-def setup_logging(log, debug=False):
-    log_formatter = logging.Formatter(
-        "%(asctime)s - %(message)s")
-
-    # stdout
-    handler = logging.StreamHandler()
-    handler.setFormatter(log_formatter)
-    log.addHandler(handler)
-
-    log.setLevel(logging.DEBUG if debug else logging.INFO)
