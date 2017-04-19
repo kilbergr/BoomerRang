@@ -15,13 +15,13 @@ from boomerrang.boomerrang_app.models import CallRequest, Org, Call
 from boomerrang.boomerrang_app import view_helpers
 
 # Setup logging
-log = logging.getLogger()
-view_helpers.setup_logging(log)
+log = logging.getLogger('boom_logger')
 
 def index(request):
     # Instantiate form
     form = BoomForm(request.POST or None, initial={
                     'source_num': '+15105555555'})
+
 
     if request.method == 'POST':
         # Load our Twilio credentials
