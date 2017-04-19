@@ -1,6 +1,7 @@
 import logging
 import os
 
+
 def load_twilio_config():
     twilio_account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
     twilio_auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
