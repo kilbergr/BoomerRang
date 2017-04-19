@@ -22,7 +22,6 @@ def index(request):
     form = BoomForm(request.POST or None, initial={
                     'source_num': '+15105555555'})
 
-
     if request.method == 'POST':
         # Load our Twilio credentials
         (twilio_number, twilio_account_sid,
