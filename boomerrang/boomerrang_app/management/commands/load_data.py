@@ -79,5 +79,5 @@ class Command(BaseCommand):
                 self.stdout.write("No data to delete.")
 
         else:
-            self.stdout.write('Must pass in either "--load-db" or "--delete" <Model>')
+            self.stdout.write('Must pass in either "--load-db" or "--delete"')
             pass
