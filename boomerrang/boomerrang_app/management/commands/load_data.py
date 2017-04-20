@@ -60,8 +60,6 @@ class Command(BaseCommand):
             self.stdout.write("Data loaded successfully: {}".format(data))
 
         elif options['delete']:
-            import pdb
-            pdb.set_trace()
             call_requests = CallRequest.objects.all()
             for cr in call_requests:
                 cr.delete()

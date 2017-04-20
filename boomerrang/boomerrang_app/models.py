@@ -1,9 +1,10 @@
 from django.db import models
 from django.core.validators import RegexValidator
+import logging
 
 from phonenumber_field.modelfields import PhoneNumberField
 
-log = logger.getLogger("boom_logger")
+log = logging.getLogger('boom_logger')
 
 class Org(models.Model):
     username = models.CharField(max_length=254)
@@ -19,8 +20,8 @@ class CallRequest(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.org:
-
-            return # must have an org to be entered into db
+            log.warning("CallRequest object must have an org to be entered into db.")
+            return
         else:
             super(CallRequest, self).save(*args, **kwargs)
 
@@ -33,7 +34,8 @@ class Call(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.call_request:
-            return # must have an org to be entered into db
+            log.warning("Call object must have a CallRequest object to be entered into db.")
+            return
         else:
             super(Call, self).save(*args, **kwargs)
 
