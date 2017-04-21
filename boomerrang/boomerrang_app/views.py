@@ -6,6 +6,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 import logging
+import os
 
 from twilio import twiml
 from twilio.rest import Client
@@ -39,10 +40,9 @@ def index(request):
                 log.error(e)
 
             try:
-                outbound_url = 'http://polar-wave-91710.herokuapp.com/outbound/'
                 twilio_client.calls.create(from_=twilio_number,
                                            to=source_num,
-                                           url=outbound_url)
+                                           url=os.environ.get('OUTBOUND_URL'))
 
             except Exception as e:
                 log.error('Call unable to be initiated to source: {}, {}'.format(source_num, e))
@@ -59,10 +59,11 @@ def index(request):
 def outbound(request):
     try:
         response = twiml.Response()
-        response.say("Gracias por contactar con Boomerrang. Estamos "
-                     "conectandote con vuestra representativa, Senor Bob.",
-                     voice='alice', language='es-ES')
+        response.say("Hello, you'll be connected momentarily to your "
+                     "representative, Senator Feinstein, via Boomerrang.",
+                     voice='alice', language='en-EN')
         log.info('Automated message delivered to source number.')
+
         with response.dial() as dial:
             target_num = "+15102894755"
             dial.number(target_num)
@@ -71,6 +72,6 @@ def outbound(request):
         log.error('Call unable to connect to target: {}'.format(target_num))
         return redirect('index')
 
-    log.info('Call from {} to {} successful!'.format(source_num, target_num))
+    log.info('Call to {} successful!'.format(target_num))
 
     return HttpResponse(response)
