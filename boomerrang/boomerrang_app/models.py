@@ -1,8 +1,10 @@
 from django.db import models
 from django.core.validators import RegexValidator
+import logging
 
 from phonenumber_field.modelfields import PhoneNumberField
 
+log = logging.getLogger('boom_logger')
 
 class Org(models.Model):
     username = models.CharField(max_length=254)
