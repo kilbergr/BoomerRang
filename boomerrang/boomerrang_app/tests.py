@@ -52,35 +52,35 @@ class ModelTests(TestCase):
 class ViewTests(TestCase):
 
     def test_index_response(self):
-      # Given: Views
-      # When: Home view is visited
+        # Given: Views
+        # When: Home view is visited
         response = self.client.get('/')
 
         # Then: Expect form in response, and status_code of 200
         self.assertEqual(response.status_code, 200)
         self.assertTrue('form' in response.context)
 
-   # TODO: (Rebecca) Needs views tests that test Twilio
-   #  def test_create_call(self):
-   #    test_num, test_sid, test_token = view_helpers.load_twilio_config()
-   #    self.client.calls.create(url="http://demo.twilio.com/docs/voice.xml",
-      # to="+14108675309",
-      # from_="+15005550006")
-   #    self.assertEqual(CallStatus.Success, client.call.Status);
+       # TODO: (Rebecca) Needs views tests that test Twilio
+       #  def test_create_call(self):
+       #    test_num, test_sid, test_token = view_helpers.load_twilio_config()
+       #    self.client.calls.create(url="http://demo.twilio.com/docs/voice.xml",
+          # to="+14108675309",
+          # from_="+15005550006")
+       #    self.assertEqual(CallStatus.Success, client.call.Status);
 
-   #    response = self.client.post('/', {'form': {'source_num': '+19175263426'}})
+       #    response = self.client.post('/', {'form': {'source_num': '+19175263426'}})
 
-   # TODO: (Rebecca) Test the db insertion of callrequest obj
+       # TODO: (Rebecca) Test the db insertion of callrequest obj
 
 
 class ViewHelpersTests(TestCase):
 
     def test_load_twilio_config(self):
-      # Given: View_helpers
-      # When: Twilio configs are loaded
-      test_num, test_sid, test_token = view_helpers.load_twilio_config()
+        # Given: View_helpers
+        # When: Twilio configs are loaded
+        test_num, test_sid, test_token = view_helpers.load_twilio_config()
 
-      # Then: configs conform to expectations
-      self.assertEqual(len(test_token), 32)
-      self.assertEqual(len(test_sid), 34)
-      self.assertIn('+1', test_num)
+        # Then: configs conform to expectations
+        self.assertEqual(len(test_token), 32)
+        self.assertEqual(len(test_sid), 34)
+        self.assertIn('+1', test_num)
