@@ -16,26 +16,11 @@ class CallRequest(models.Model):
     target_num = PhoneNumberField()
     call_completed = models.NullBooleanField()
     time_scheduled = models.DateTimeField(auto_now=False)
-    org = models.ForeignKey(Org, on_delete=models.SET_NULL, null=True, related_name="call_requests")
-
-    def save(self, *args, **kwargs):
-        if not self.org:
-            log.warning("CallRequest object must have an org to be entered into db.")
-            return
-        else:
-            super(CallRequest, self).save(*args, **kwargs)
+    org = models.ForeignKey(Org, related_name="call_requests")
 
 
 class Call(models.Model):
     call_time = models.DateTimeField(auto_now=False)
     success = models.NullBooleanField()
     duration = models.DateTimeField(auto_now=False, null=True)
-    call_request = models.ForeignKey(CallRequest, on_delete=models.SET_NULL, null=True, related_name="calls")
-
-    def save(self, *args, **kwargs):
-        if not self.call_request:
-            log.warning("Call object must have a CallRequest object to be entered into db.")
-            return
-        else:
-            super(Call, self).save(*args, **kwargs)
-
+    call_request = models.ForeignKey(CallRequest, related_name="calls")

@@ -41,14 +41,14 @@ class Command(BaseCommand):
             # Add CallRequests
             now = timezone.now()
             cr1 = CallRequest.objects.create(
-                    source_num='19175263426',
-                    target_num='15102894755',
+                    source_num='15555555555',
+                    target_num='15555555555',
                     time_scheduled=now,
                     org=org1
                     )
             cr2 = CallRequest.objects.create(
-                    source_num='15102894755',
-                    target_num='19175263426',
+                    source_num='15555555555',
+                    target_num='15555555555',
                     time_scheduled=now,
                     org=org2
                     )
