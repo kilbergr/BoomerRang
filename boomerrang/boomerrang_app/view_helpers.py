@@ -39,10 +39,10 @@ def make_calls(call_request, request):
 
     # Place calls
     try:
-        import ipdb; ipdb.set_trace()
         twilio_client.calls.create(from_=twilio_number,
                                    to=source_num,
-                                   url=os.environ.get('OUTBOUND_URL'))
+                                   url=urljoin(os.environ.get('OUTBOUND_URL'),
+                                               target_num))
 
     except Exception as e:
         log.error('Call unable to be initiated to source: {}, {}'.format(

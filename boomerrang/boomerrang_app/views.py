@@ -72,9 +72,8 @@ def index(request):
 
 
 @csrf_exempt
-def outbound(request):
+def outbound(request, target_num):
     try:
-        import ipdb; ipdb.set_trace()
         response = twiml.Response()
         response.say("Hello, you'll be connected momentarily to your "
                      "representative, Senator Feinstein, via Boomerrang. Bai Felicia.",
@@ -82,7 +81,6 @@ def outbound(request):
         log.info('Automated message delivered to source number.')
 
         with response.dial() as dial:
-            target_num = "+15102894755"
             dial.number(target_num)
 
     except Exception as e:
