@@ -1,4 +1,14 @@
+from django.contrib import messages
+from django.shortcuts import redirect
+import logging
 import os
+from urllib.parse import urljoin
+
+from twilio.rest import Client
+
+
+# Setup logging
+log = logging.getLogger('boom_logger')
 
 
 def load_twilio_config():
@@ -10,3 +20,31 @@ def load_twilio_config():
         print('Twilio auth info not configured.')
         raise MiddlewareNotUsed
     return (twilio_number, twilio_account_sid, twilio_auth_token)
+
+
+def make_calls(call_request, request):
+     # Load our Twilio credentials
+    (twilio_number, twilio_account_sid,
+    twilio_auth_token) = load_twilio_config()
+    # Create Twilio client
+    try:
+        twilio_client = Client(twilio_account_sid, twilio_auth_token)
+    except Exception as e:
+        log.error(e)
+
+    source_num = '+{}{}'.format(call_request.source_num.country_code,
+                                call_request.source_num.national_number)
+    target_num = '+{}{}/'.format(call_request.target_num.country_code,
+                                call_request.target_num.national_number)
+
+    # Place calls
+    try:
+        import ipdb; ipdb.set_trace()
+        twilio_client.calls.create(from_=twilio_number,
+                                   to=source_num,
+                                   url=os.environ.get('OUTBOUND_URL'))
+
+    except Exception as e:
+        log.error('Call unable to be initiated to source: {}, {}'.format(
+            call_request.source_num, e))
+        return redirect('index')

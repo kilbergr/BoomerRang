@@ -18,6 +18,13 @@ class CallRequest(models.Model):
     time_scheduled = models.DateTimeField(auto_now=False)
     org = models.ForeignKey(Org, related_name="call_requests")
 
+    class Meta:
+        unique_together = ('source_num',
+                           'target_num',
+                           'time_scheduled',
+                           'call_completed',
+                           'org')
+
 
 class Call(models.Model):
     call_time = models.DateTimeField(auto_now=False)
