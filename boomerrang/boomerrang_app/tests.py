@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime
 from django.test import Client
 from django.utils import timezone
@@ -191,11 +192,12 @@ class ViewHelpersTests(unittest.TestCase):
 
     @patch.object(view_helpers.Client, 'calls', autospec=True)
     def test_make_calls_places_call(self, mock_calls):
-        # Given: A call_req with twilio # +15107571675
-        call_time = timezone.now()
+        # Given: A call_req with twilio number
+        time_scheduled = datetime.now().strftime('%m-%d-%Y')
         org = Org(username='boblah', password='blah')
         call_req = CallRequest(
-            source_num='+15005550006', target_num='+15005550006', org=org)
+            source_num='+15005550006', target_num='+15005550006',
+            time_scheduled=time_scheduled, org=org)
 
         # When: make_calls is called
         view_helpers.make_calls(call_req)
