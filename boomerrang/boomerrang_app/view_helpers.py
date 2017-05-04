@@ -34,10 +34,11 @@ def make_calls(call_request):
 
     source_num = '+{}{}'.format(call_request.source_num.country_code,
                                 call_request.source_num.national_number)
+    # Needs trailing / for URL
     target_num = '+{}{}/'.format(call_request.target_num.country_code,
                                 call_request.target_num.national_number)
 
-    # Place calls
+    # Place calls, url constructed from env var and target_num var
     try:
         twilio_client.calls.create(from_=twilio_number,
                                    to=source_num,

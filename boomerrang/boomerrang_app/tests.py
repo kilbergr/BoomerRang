@@ -1,11 +1,10 @@
-from phonenumber_field.phonenumber import PhoneNumber
-
+from datetime import datetime
 from django.test import Client
 from django.utils import timezone
-from datetime import datetime
 import unittest
 from unittest.mock import patch
 
+from phonenumber_field.phonenumber import PhoneNumber
 
 from boomerrang.boomerrang_app.models import Org, CallRequest, Call
 from boomerrang.boomerrang_app.forms import BoomForm
@@ -90,7 +89,7 @@ class ViewTests(unittest.TestCase):
         # Then the form is valid
         self.assertTrue(form.is_valid())
 
-    def test__invalid_phone_number_yields_form_invalid(self):
+    def test_invalid_phone_number_yields_invalid_form(self):
       # Given: Invalid PhoneNumber and date time objects
         source_num = PhoneNumber.from_string('+15105005000')
         target_num = PhoneNumber.from_string('+1415500000')
@@ -107,8 +106,8 @@ class ViewTests(unittest.TestCase):
         # Then the form is valid
         self.assertFalse(form.is_valid())
 
-    def test__invalid_datetime_yields_form_invalid(self):
-      # Given: Invalid PhoneNumber and date time objects
+    def test_invalid_datetime_yields_invalid_form(self):
+      # Given: PhoneNumber and invalid datetime objects
         source_num = PhoneNumber.from_string('+15105005000')
         target_num = PhoneNumber.from_string('+14155100000')
         time_scheduled = datetime.now().strftime('%Y-%m-%d')
@@ -126,7 +125,7 @@ class ViewTests(unittest.TestCase):
 
     @patch.object(view_helpers.Client, 'calls', autospec=True)
     def test_valid_form_can_post_and_create_call_request(self, mock_calls):
-      # Given: PhoneNumber and date time objects
+      # Given: valid PhoneNumber and datetime objects
         source_num = PhoneNumber.from_string('+15105005000')
         target_num = PhoneNumber.from_string('+14155005000')
         time_scheduled = datetime.now().strftime('%m-%d-%Y')
@@ -150,7 +149,7 @@ class ViewTests(unittest.TestCase):
         self.assertEqual(call_req[0].target_num, target_num)
 
     @patch.object(view_helpers.Client, 'calls', autospec=True)
-    def test_invalid_form_cannot_post_and_create_call_request(self, mock_calls):
+    def test_invalid_form_cannot_post_or_create_call_request(self, mock_calls):
       # Given: PhoneNumber and invalid date time objects
         source_num = PhoneNumber.from_string('+15105005000')
         target_num = PhoneNumber.from_string('+14155005000')

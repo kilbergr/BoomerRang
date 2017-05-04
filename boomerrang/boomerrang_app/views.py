@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
+from datetime import timedelta
 from django.contrib import messages
 from django.core.exceptions import MiddlewareNotUsed
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-import datetime
-from datetime import timedelta
 import logging
 import os
 
