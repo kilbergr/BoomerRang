@@ -1,8 +1,10 @@
 from datetime import datetime
 from django.test import Client
 from django.utils import timezone
+import os
 import unittest
 from unittest.mock import patch
+from urllib.parse import urljoin
 
 from phonenumber_field.phonenumber import PhoneNumber
 
@@ -200,5 +202,7 @@ class ViewHelpersTests(unittest.TestCase):
 
         # Then: create has been called with expected input
         self.assertEqual(mock_calls.create.call_count, 1)
+        # Including the correct forwarding URL
+        full_url = urljoin(os.environ.get('OUTBOUND_URL'), '+15005550006/')
         mock_calls.create.assert_called_once_with(
-            from_='+15107571675', to='+15005550006', url='+15005550006/')
+            from_='+15107571675', to='+15005550006', url=full_url)
