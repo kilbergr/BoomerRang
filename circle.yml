@@ -1,5 +1,7 @@
 ## Include postgresql
 machine:
+  python:
+    version: pypy-3.5.1
   services:
     - postgresql
 ## Customize database setup
