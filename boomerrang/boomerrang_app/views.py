@@ -27,7 +27,6 @@ def index(request):
     form = BoomForm(request.POST or None)
 
     if request.method == 'POST':
-
         # If form valid, clean data and place call
         if form.is_valid():
             # Clean objectss
@@ -38,7 +37,6 @@ def index(request):
             org = Org.objects.all()[0]
             past_cutoff = time_scheduled_obj - timedelta(hours=12)
             future_cutoff = time_scheduled_obj + timedelta(hours=12)
-
             existing_requests = CallRequest.objects.filter(
                 source_num=source_num_obj,
                 target_num=target_num_obj,
@@ -53,11 +51,12 @@ def index(request):
                 new_call_request = CallRequest.objects.create(source_num=source_num_obj,
                                            target_num=target_num_obj,
                                            time_scheduled=time_scheduled_obj,
+                                           call_completed=False,
                                            org=org)
 
                 # Scheduler runs here, determines which calls to make
                 try:
-                    view_helpers.make_calls(new_call_request, request)
+                    view_helpers.make_calls(new_call_request)
                     messages.success(request, 'Call incoming!')
                     log.info('Call initiated to source - {}'.format(new_call_request.source_num))
                 except Exception as e:

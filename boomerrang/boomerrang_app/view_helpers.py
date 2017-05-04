@@ -22,7 +22,7 @@ def load_twilio_config():
     return (twilio_number, twilio_account_sid, twilio_auth_token)
 
 
-def make_calls(call_request, request):
+def make_calls(call_request):
      # Load our Twilio credentials
     (twilio_number, twilio_account_sid,
     twilio_auth_token) = load_twilio_config()
