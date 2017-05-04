@@ -2,7 +2,7 @@ from datetime import datetime
 from django.test import Client
 from django.utils import timezone
 import unittest
-from mock import patch
+from unittest.mock import patch
 
 from phonenumber_field.phonenumber import PhoneNumber
 
