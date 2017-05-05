@@ -42,7 +42,10 @@ def make_call(call_request):
     twilio_client.calls.create(from_=twilio_number,
                                to=source_num,
                                url=urljoin(os.environ.get('OUTBOUND_URL'),
-                                           target_num),)
+                                  target_num),
+                               method='GET',
+                               status_callback=os.environ.get('CALL_STATUS_URL'),
+                               status_callback_method='POST')
 
 
 def launch_call_process(call_request):

@@ -100,3 +100,9 @@ def outbound(request, target_num):
     log.info('Call to {} successful!'.format(target_num))
 
     return HttpResponse(response)
+
+
+@csrf_exempt
+def call_status(request):
+    print(request.body)
+    print('you made it!')
