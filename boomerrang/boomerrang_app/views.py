@@ -28,18 +28,19 @@ def index(request):
     if request.method == 'POST':
         # If form valid, clean data and place call
         if form.is_valid():
-            # Clean objectss
+            # Clean objects
             source_num_obj = form.cleaned_data['source_num']
             target_num_obj = form.cleaned_data['target_num']
             time_scheduled_obj = form.cleaned_data['time_scheduled']
 
-            org = Org.objects.all()[0]
+            # Todo (rebecca) should retrieve org object from page info or user info
+            fake_org = Org.objects.get_or_create(username='mpi', password='truss')[0]
             past_cutoff = time_scheduled_obj - timedelta(hours=12)
             future_cutoff = time_scheduled_obj + timedelta(hours=12)
             existing_requests = CallRequest.objects.filter(
                 source_num=source_num_obj,
                 target_num=target_num_obj,
-                org=org,
+                org=fake_org,
                 time_scheduled__gte=past_cutoff,
                 time_scheduled__lte=future_cutoff
                 )
@@ -51,17 +52,12 @@ def index(request):
                                            target_num=target_num_obj,
                                            time_scheduled=time_scheduled_obj,
                                            call_completed=False,
-                                           org=org)
+                                           org=fake_org)
 
                 # Scheduler runs here, determines which calls to make
-                try:
-                    view_helpers.make_calls(new_call_request)
-                    messages.success(request, 'Call incoming!')
-                    log.info('Call initiated to source - {}'.format(new_call_request.source_num))
-                except Exception as e:
-                    log.error('Call unable to be completed to target: {}, {}'.format(
-                    new_call_request.target_num, e))
-                    return redirect('index')
+                view_helpers.make_call(new_call_request)
+                messages.success(request, 'Call incoming!')
+                log.info('Call initiated to source - {}'.format(new_call_request.source_num))
             else:
                 messages.error(request, 'You are placing too many calls during this period.')
         else:

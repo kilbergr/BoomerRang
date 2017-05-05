@@ -24,7 +24,8 @@ class ModelTests(unittest.TestCase):
         org = Org.objects.create(username='boblah', password='blah')
         org2 = Org.objects.create(username='org2', password='pw2')
 
-        # And: A call_req associated with one of them
+        # And: A call_req with a valid and available twilio number is
+        # associated with one of them
         call_req = CallRequest(
           source_num='+15005550006', target_num='+15005550006', org=org)
 
@@ -48,7 +49,7 @@ class ModelTests(unittest.TestCase):
         # Given: A CallRequest object without an Org
         call_time = timezone.now()
 
-        # When: CallRequest obj is created
+        # When: CallRequest obj is created with a valid & available twilio number
         call_request = CallRequest(
           source_num='15005550006',
           target_num='15005550006',
@@ -76,7 +77,7 @@ class ViewTests(unittest.TestCase):
         self.assertTrue('form' in response.context)
 
     def test_form_valid(self):
-      # Given: PhoneNumber and date time objects
+        # Given: PhoneNumber and date time objects
         source_num = PhoneNumber.from_string('+15105005000')
         target_num = PhoneNumber.from_string('+14155005000')
         time_scheduled = datetime.now().strftime('%m-%d-%Y')
@@ -93,7 +94,7 @@ class ViewTests(unittest.TestCase):
         self.assertTrue(form.is_valid())
 
     def test_invalid_phone_number_yields_invalid_form(self):
-      # Given: Invalid PhoneNumber and date time objects
+        # Given: Invalid PhoneNumber and date time objects
         source_num = PhoneNumber.from_string('+15105005000')
         target_num = PhoneNumber.from_string('+1415500000')
         time_scheduled = datetime.now().strftime('%m-%d-%Y')
@@ -106,11 +107,11 @@ class ViewTests(unittest.TestCase):
 
         # If that data is in a BoomForm
         form = BoomForm(data=form_data)
-        # Then the form is valid
+        # Then the form is invalid
         self.assertFalse(form.is_valid())
 
     def test_invalid_datetime_yields_invalid_form(self):
-      # Given: PhoneNumber and invalid datetime objects
+        # Given: PhoneNumber and invalid datetime objects
         source_num = PhoneNumber.from_string('+15105005000')
         target_num = PhoneNumber.from_string('+14155100000')
         time_scheduled = datetime.now().strftime('%Y-%m-%d')
@@ -123,12 +124,12 @@ class ViewTests(unittest.TestCase):
 
         # If that data is in a BoomForm
         form = BoomForm(data=form_data)
-        # Then the form is valid
+        # Then the form is invalid
         self.assertFalse(form.is_valid())
 
     @patch.object(view_helpers.Client, 'calls', autospec=True)
     def test_valid_form_can_post_and_create_call_request(self, mock_calls):
-      # Given: valid PhoneNumber and datetime objects
+        # Given: valid PhoneNumber and datetime objects
         source_num = PhoneNumber.from_string('+15105005000')
         target_num = PhoneNumber.from_string('+14155005000')
         time_scheduled = datetime.now().strftime('%m-%d-%Y')
@@ -153,7 +154,7 @@ class ViewTests(unittest.TestCase):
 
     @patch.object(view_helpers.Client, 'calls', autospec=True)
     def test_invalid_form_cannot_post_or_create_call_request(self, mock_calls):
-      # Given: PhoneNumber and invalid date time objects
+        # Given: PhoneNumber and invalid date time objects
         source_num = PhoneNumber.from_string('+15105005000')
         target_num = PhoneNumber.from_string('+14155005000')
         time_scheduled = datetime.now()
@@ -191,16 +192,16 @@ class ViewHelpersTests(unittest.TestCase):
         self.assertIn('+1', test_num)
 
     @patch.object(view_helpers.Client, 'calls', autospec=True)
-    def test_make_calls_places_call(self, mock_calls):
-        # Given: A call_req with twilio number
+    def test_make_call_places_call(self, mock_calls):
+        # Given: A call_req with a valid and available twilio number
         time_scheduled = datetime.now().strftime('%m-%d-%Y')
         org = Org(username='boblah', password='blah')
         call_req = CallRequest(
             source_num='+15005550006', target_num='+15005550006',
             time_scheduled=time_scheduled, org=org)
 
-        # When: make_calls is called
-        view_helpers.make_calls(call_req)
+        # When: make_call is called
+        view_helpers.make_call(call_req)
 
         # Then: create has been called with expected input
         self.assertEqual(mock_calls.create.call_count, 1)

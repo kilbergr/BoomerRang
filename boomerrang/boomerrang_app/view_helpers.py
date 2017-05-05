@@ -22,7 +22,7 @@ def load_twilio_config():
     return (twilio_number, twilio_account_sid, twilio_auth_token)
 
 
-def make_calls(call_request):
+def make_call(call_request):
      # Load our Twilio credentials
     (twilio_number, twilio_account_sid,
     twilio_auth_token) = load_twilio_config()
@@ -38,7 +38,7 @@ def make_calls(call_request):
     target_num = '+{}{}/'.format(call_request.target_num.country_code,
                                 call_request.target_num.national_number)
 
-    # Place calls, url constructed from env var and target_num var
+    # Place call, url constructed from env var and target_num var
     try:
         twilio_client.calls.create(from_=twilio_number,
                                    to=source_num,
