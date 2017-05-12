@@ -1,5 +1,4 @@
-from django.contrib import messages
-from django.shortcuts import redirect
+from django.core.exceptions import MiddlewareNotUsed
 import logging
 import os
 from urllib.parse import urljoin
@@ -23,8 +22,8 @@ def load_twilio_config():
 
 
 def make_call(call_request):
-     # Load our Twilio credentials
-    (twilio_number, twilio_account_sid, twilio_auth_token) = load_twilio_config()
+    # Load our Twilio credentials
+    twilio_number, twilio_account_sid, twilio_auth_token = load_twilio_config()
     # Create Twilio client
     try:
         twilio_client = Client(twilio_account_sid, twilio_auth_token)
@@ -35,7 +34,7 @@ def make_call(call_request):
                                 call_request.source_num.national_number)
     # Needs trailing / for URL
     target_num = '+{}{}/'.format(call_request.target_num.country_code,
-                                call_request.target_num.national_number)
+                                 call_request.target_num.national_number)
 
     # Place call, url constructed from env var and target_num var
     twilio_client.calls.create(from_=twilio_number,

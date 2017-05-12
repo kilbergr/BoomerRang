@@ -1,24 +1,22 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta
 from django.contrib import messages
-from django.core.exceptions import MiddlewareNotUsed
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 import logging
-import os
 
 from twilio import twiml
 
 from boomerrang.boomerrang_app.forms import BoomForm
-from boomerrang.boomerrang_app.models import CallRequest, Org, Call
+from boomerrang.boomerrang_app.models import CallRequest, Org
 from boomerrang.boomerrang_app import view_helpers
 
 # Setup logging
 log = logging.getLogger('boom_logger')
 # Magic constants
-_NUM_ALLOWED_CALLS=10
+_NUM_ALLOWED_CALLS = 10
 
 
 def index(request):
@@ -33,8 +31,10 @@ def index(request):
             target_num_obj = form.cleaned_data['target_num']
             time_scheduled_obj = form.cleaned_data['time_scheduled']
 
-            # Todo (rebecca) should retrieve org object from page info or user info
-            fake_org = Org.objects.get_or_create(username='mpi', password='truss')[0]
+            # Todo (rebecca) should retrieve org object from page info or user
+            # info
+            fake_org = Org.objects.get_or_create(
+                username='mpi', password='truss')[0]
             past_cutoff = time_scheduled_obj - timedelta(hours=12)
             future_cutoff = time_scheduled_obj + timedelta(hours=12)
             existing_requests = CallRequest.objects.filter(
@@ -43,30 +43,34 @@ def index(request):
                 org=fake_org,
                 time_scheduled__gte=past_cutoff,
                 time_scheduled__lte=future_cutoff
-                )
+            )
 
-            # Ensure this person is not placing too many calls to the same target in 24 hours.
+            # Ensure this person is not placing too many calls to the same
+            # target in 24 hours.
             if len(existing_requests) < _NUM_ALLOWED_CALLS:
                 # Make new call request object
                 new_call_request = CallRequest.objects.create(
-                                           source_num=source_num_obj,
-                                           target_num=target_num_obj,
-                                           org=fake_org,
-                                           time_scheduled=time_scheduled_obj,
-                                           call_completed=False,)
+                    source_num=source_num_obj,
+                    target_num=target_num_obj,
+                    org=fake_org,
+                    time_scheduled=time_scheduled_obj,
+                    call_completed=False,)
 
                 # Scheduler runs here, determines which calls to make
                 try:
                     view_helpers.make_call(new_call_request)
                     messages.success(request, 'Call incoming!')
-                    log.info('Call initiated to source - {}'.format(new_call_request.source_num))
+                    log.info('Call initiated to source - {}'.format(
+                        new_call_request.source_num))
 
                 except Exception as e:
-                    log.error('Call unable to be initiated to source: {}, {}'.format(
-                        call_request.source_num, e))
+                    err_msg = 'Call unable to be initiated to source: {}, {}'
+                    log.error(err_msg.format(new_call_request.source_num, e))
                     return redirect('index')
             else:
-                messages.error(request, 'You are placing too many calls during this period.')
+                messages.error(
+                    request,
+                    'You are placing too many calls during this period.')
         else:
             messages.error(request, 'Invalid entry: {}'.format(form.errors))
     return render(request, 'index.html', {'form': form})
@@ -77,7 +81,8 @@ def outbound(request, target_num):
     try:
         response = twiml.Response()
         response.say("Hello, you'll be connected momentarily to your "
-                     "representative, Senator Feinstein, via Boomerrang. Bai Felicia.",
+                     "representative, Senator Feinstein, via Boomerrang. "
+                     "Bai Felicia.",
                      voice='alice', language='en-EN')
         log.info('Automated message delivered to source number.')
 
