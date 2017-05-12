@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from email.utils import parsedate_to_datetime
 import logging
 
 from twilio import twiml
@@ -103,6 +104,32 @@ def outbound(request, target_num):
 
 
 @csrf_exempt
-def call_status(request):
-    print(request.body)
-    print('you made it!')
+def call_status(request, call_req_id):
+    # Create dict to hold information of interest from call status response
+    call_status_info = {}
+
+    # Retrieve information we need to determine success of call
+    # CallStatus will be 'completed', 'in-progress', or 'failed'
+    # CallDuration will return the duration in seconds
+    # Timestamp will return time call was made in RFC 2822
+    status_entries = ['CallStatus', 'CallDuration', 'Timestamp']
+    for entry in status_entries:
+        call_status_info[entry] = request.GET[entry]
+
+    # Set Timestamp entry to datetime obj instead of RFC 2822
+    call_status_info['Timestamp'] = parsedate_to_datetime(call_status_info['Timestamp'])
+
+    # Identify related call_request
+    related_cr = CallRequest.objects.get(id=call_req_id)
+
+    # Check whether call was successful, set CallRequest.call_completed to True if so
+    if call_status_info['CallStatus']=='completed':
+        success = True
+        related_cr.call_completed = True
+    else:
+        success = False
+
+    new_call_obj = Call.objects.create(call_time=call_status_info['Timestamp'],
+                               success=success,
+                               duration=call_status_info['CallDuration'],
+                               call_request=related_cr,)

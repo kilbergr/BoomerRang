@@ -44,7 +44,8 @@ def make_call(call_request):
                                url=urljoin(os.environ.get('OUTBOUND_URL'),
                                   target_num),
                                method='GET',
-                               status_callback=os.environ.get('CALL_STATUS_URL'),
+                               status_callback=urljoin(os.environ.get('CALL_STATUS_URL'),
+                                                       str(call_request.id)),
                                status_callback_method='POST')
 
 
