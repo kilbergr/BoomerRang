@@ -150,13 +150,11 @@ class ViewTests(unittest.TestCase):
 
         # When the form is posted
         self.client.post('/', data=form_data)
-        # Then a call will be created
-        # self.assertEqual(mock_calls.create.call_count, 1)
 
         call_req = CallRequest.objects.filter(
             source_num='+15105005000',
             target_num='+14155005000',)
-        # And the resulting call_request object will contain expected data
+        # The resulting call_request object will contain expected data
         self.assertEqual(call_req[0].source_num, source_num)
         self.assertEqual(call_req[0].target_num, target_num)
 
