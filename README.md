@@ -53,5 +53,5 @@ The app requires environment variables to be set with your Twilio account keys a
     * Note: ngrok must be running on the same port as django.
 3. To run the server on port 4567, run `python manage.py runserver 4567` in a separate terminal tab.
 	* If you see this: `django.core.exceptions.ImproperlyConfigured: settings.DATABASES is improperly configured. Please supply the ENGINE value. Check settings documentation for more details.`, run this in your terminal:
-	`export DATABASE_URL=postgres://trussel:pwd@127.0.0.1:5432/boomerang_db`. This sets the environmental variable locally that django needs to look to the local postgres database.
+	`export DATABASE_URL=postgres://127.0.0.1:5432/boomerang_db`. This sets the environmental variable locally that django needs to look to the local postgres database.
 4. Point your browser to: <http://127.0.0.1:4567> to see things.
