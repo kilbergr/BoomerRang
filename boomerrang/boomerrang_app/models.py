@@ -29,5 +29,5 @@ class CallRequest(models.Model):
 class Call(models.Model):
     call_time = models.DateTimeField(auto_now=False)
     success = models.NullBooleanField()
-    duration = models.DateTimeField(auto_now=False, null=True)
+    duration = models.IntegerField(null=True)
     call_request = models.ForeignKey(CallRequest, related_name="calls")
