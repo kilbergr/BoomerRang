@@ -5,6 +5,8 @@ from unittest.mock import patch
 from urllib.parse import urljoin
 
 import django
+from django.core.exceptions import MiddlewareNotUsed
+from django.db.utils import IntegrityError
 from django.test import Client
 from django.utils import timezone
 from phonenumber_field.phonenumber import PhoneNumber
@@ -18,6 +20,17 @@ FAKE_TWILIO_CONFIG_DICT = {
     'TWILIO_ACCOUNT_SID': 'hi',
     'TWILIO_AUTH_TOKEN': 'hi',
     'TWILIO_NUMBER': 'hi'
+}
+
+FAKE_EMPTY_TWILIO_CONFIG_DICT = {
+    'TWILIO_ACCOUNT_SID': 'hi',
+    'TWILIO_AUTH_TOKEN': '',
+    'TWILIO_NUMBER': 'hi'
+}
+
+FAKE_ENV_URLS = {
+    'CALL_STATUS_URL': 'http://www.boomerrang.com/call-status/',
+    'OUTBOUND_URL': 'http://www.boomerrang.com/outbound/',
 }
 
 
@@ -68,6 +81,30 @@ class ModelTests(django.test.TestCase):
         with self.assertRaises(Exception):
             # Then: Raise exception when attempting to save call obj
             call_request.save()
+
+    def test_callrequest_must_be_unique(self):
+        # Given: A valid CallRequest object
+        org = Org.objects.create(username='boblah', password='blah')
+        call_time = timezone.now()
+        call_request1 = CallRequest.objects.create(
+            source_num='15005550006',
+            target_num='15005550006',
+            org=org,
+            time_scheduled=call_time,
+            call_completed=False
+        )
+
+        # When: A duplicate is created
+        # Then: Raise exception because unique constraint violated
+        with self.assertRaises(IntegrityError):
+            call_request2 = CallRequest.objects.create(
+                source_num='15005550006',
+                target_num='15005550006',
+                org=org,
+                time_scheduled=call_time,
+                call_completed=False
+            )
+
 
 
 class ViewTests(django.test.TestCase):
@@ -214,7 +251,23 @@ class ViewTests(django.test.TestCase):
         # And there will be no resulting call_request object
         self.assertEqual(len(call_req), 0)
 
-        # TODO: (Rebecca) Needs views tests that test Twilio
+    @patch.object(view_helpers.Client, 'calls', autospec=True)
+    def test_unsuccessful_call_raises_exception(self, mock_calls):
+        # Given: A call_req with a valid and available twilio number
+        time_scheduled = datetime.now().strftime('%m-%d-%Y')
+        org = Org(username='boblah', password='blah')
+        call_req = CallRequest(
+            source_num='+15005550006', target_num='+15005550006',
+            time_scheduled=time_scheduled, org=org)
+
+        # And: A mock that will fail when creating a call
+        mock_calls.create.side_effect = Exception('Error raised')
+
+        # When: make_call is called
+        # Then: An Exception will be raised
+        with self.assertRaises(Exception):
+            view_helpers.make_call(call_req)
+
 
 
 class ViewHelpersTests(django.test.TestCase):
@@ -228,8 +281,18 @@ class ViewHelpersTests(django.test.TestCase):
         # Then: configs conform to expectations
         self.assertEqual(config, tuple(FAKE_TWILIO_CONFIG_DICT.values()))
 
+    @patch.dict(os.environ, FAKE_EMPTY_TWILIO_CONFIG_DICT)
+    def test_load_no_twilio_config_fails(self):
+        # Given: View_helpers
+        # When: Twilio configs with missing env variables
+
+        # Then: lack of env variables raises MiddlewareNotUsed exception
+        with self.assertRaises(MiddlewareNotUsed):
+            view_helpers.load_twilio_config()
+
     @patch.object(view_helpers.Client, 'calls', autospec=True)
     @patch.dict(os.environ, FAKE_TWILIO_CONFIG_DICT)
+    @patch.dict(os.environ, FAKE_ENV_URLS)
     def test_make_call_places_call(self, mock_calls):
         # Given: A call_req with a valid and available twilio number
         time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
@@ -243,9 +306,13 @@ class ViewHelpersTests(django.test.TestCase):
 
         # Then: create has been called with expected input
         self.assertEqual(mock_calls.create.call_count, 1)
-        # Including the correct forwarding URL
-        full_url = urljoin(os.environ.get('OUTBOUND_URL'), '+15005550006/')
+        # Including the correct forwarding URLs
+        outbound_url = urljoin(FAKE_ENV_URLS['OUTBOUND_URL'], '+15005550006/')
+        callstatus_url = urljoin(FAKE_ENV_URLS['CALL_STATUS_URL'], str(call_req.id))
         mock_calls.create.assert_called_once_with(
             from_=FAKE_TWILIO_CONFIG_DICT['TWILIO_NUMBER'],
             to='+15005550006',
-            url=full_url)
+            url=outbound_url,
+            method='GET',
+            status_callback=callstatus_url,
+            status_callback_method='POST')

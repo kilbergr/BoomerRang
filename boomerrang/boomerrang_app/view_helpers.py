@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+from email.utils import parsedate_to_datetime
+from django.core.exceptions import MiddlewareNotUsed
+>>>>>>> still getting 500 error on statuscallback completion
 import logging
 import os
 from twilio.rest import Client
@@ -7,6 +12,10 @@ from django.core.exceptions import MiddlewareNotUsed
 from django.utils import timezone
 
 from boomerrang.boomerrang_app.models import Call
+<<<<<<< HEAD
+=======
+
+>>>>>>> still getting 500 error on statuscallback completion
 
 # Setup logging
 log = logging.getLogger('boom_logger')
@@ -46,7 +55,8 @@ def make_call(call_request):
                                method='GET',
                                status_callback=urljoin(os.environ.get('CALL_STATUS_URL'),
                                                        str(call_request.id)),
-                               status_callback_method='POST')
+                               status_callback_method='POST',
+                               if_machine='Hangup')
 
 
 def launch_call_process(call_request):
@@ -55,3 +65,38 @@ def launch_call_process(call_request):
         call_request=call_request,
         success=None)
     make_call(call_request)
+
+
+def record_call_status(request, related_cr):
+  # Create dict to hold information of interest from call status response
+  call_status_info = {}
+  import ipdb; ipdb.set_trace()
+
+  # Retrieve information we need to determine success of call
+  # CallDuration will return the duration in seconds
+  status_entries = ['CallStatus', 'Timestamp', 'AnsweredBy']
+  for entry in status_entries:
+      call_status_info[entry] = request.GET[entry]
+
+  # Set Timestamp entry to datetime obj instead of RFC 2822
+  call_status_info['Timestamp'] = parsedate_to_datetime(call_status_info['Timestamp'])
+
+  # Check whether call was completed by a human (success metric)
+  if call_status_info['CallStatus']=='completed' and call_status_info['AnsweredBy']=='human':
+      # Save call duration and set the related CallRequest.call_completed to True if so
+      call_status_info['CallDuration'] = request.GET['CallDuration']
+      success = True
+      related_cr.call_completed = True
+      related_cr.save()
+  else:
+      # Save call duration as 0 and log miss, do not change related CallRequest's call_completed
+      call_status_info['CallDuration'] = 0
+      err_msg = 'Call ended with {} status, answered by {}'
+      log.error(err_msg.format(call_status_info['CallStatus'], call_status_info['AnsweredBy']))
+      success = False
+
+  # Create a new call object recording information
+  new_call_obj = Call.objects.create(call_time=call_status_info['Timestamp'],
+                             success=success,
+                             duration=call_status_info['CallDuration'],
+                             call_request=related_cr,)
