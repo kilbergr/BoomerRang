@@ -112,8 +112,42 @@ def outbound(request, target_num):
 @csrf_exempt
 def call_status(request, call_req_id):
     # Identify related call_request
-    related_cr = CallRequest.objects.get(id=call_request_id)
+    related_cr = CallRequest.objects.get(id=call_req_id)
+
+    # Create dict to hold information of interest from call status response
+    call_status_info = {}
+
+    # Retrieve information we need to determine success of call
+    # CallDuration will return the duration in seconds
+    status_entries = ['CallStatus', 'Timestamp', 'AnsweredBy']
     try:
-        view_helpers.record_call_status(request, related_cr)
+        for entry in status_entries:
+            call_status_info[entry] = request.GET[entry]
     except KeyError as e:
         log.error('No call status information at this time.')
+
+    # Set Timestamp entry to datetime obj instead of RFC 2822
+    call_status_info['Timestamp'] = parsedate_to_datetime(call_status_info['Timestamp'])
+
+    # Check whether call was completed by a human (success metric)
+    if call_status_info['CallStatus']=='completed' and call_status_info['AnsweredBy']=='human':
+        # Save call duration and set the related CallRequest.call_completed to True if so
+        call_status_info['CallDuration'] = request.GET['CallDuration']
+        success = True
+        related_cr.call_completed = True
+        related_cr.save()
+    else:
+        # Save call duration as 0 and log miss, do not change related CallRequest's call_completed
+        call_status_info['CallDuration'] = 0
+        err_msg = 'Call ended with {} status, answered by {}'
+        log.error(err_msg.format(call_status_info['CallStatus'], call_status_info['AnsweredBy']))
+        success = False
+
+    # Create a new call object recording information
+    new_call_obj = Call.objects.create(
+        call_time=call_status_info['Timestamp'],
+        success=success,
+        duration=call_status_info['CallDuration'],
+        call_request=related_cr,)
+
+    return HttpResponse('Call status updated.')

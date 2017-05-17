@@ -315,4 +315,5 @@ class ViewHelpersTests(django.test.TestCase):
             url=outbound_url,
             method='GET',
             status_callback=callstatus_url,
-            status_callback_method='POST')
+            status_callback_method='POST',
+            if_machine='Hangup')

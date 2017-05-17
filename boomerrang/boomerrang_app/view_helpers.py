@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-=======
 from email.utils import parsedate_to_datetime
-from django.core.exceptions import MiddlewareNotUsed
->>>>>>> still getting 500 error on statuscallback completion
 import logging
 import os
 from twilio.rest import Client
@@ -12,10 +8,6 @@ from django.core.exceptions import MiddlewareNotUsed
 from django.utils import timezone
 
 from boomerrang.boomerrang_app.models import Call
-<<<<<<< HEAD
-=======
-
->>>>>>> still getting 500 error on statuscallback completion
 
 # Setup logging
 log = logging.getLogger('boom_logger')
@@ -54,7 +46,7 @@ def make_call(call_request):
                                   target_num),
                                method='GET',
                                status_callback=urljoin(os.environ.get('CALL_STATUS_URL'),
-                                                       str(call_request.id)),
+                                                       '{}/'.format(str(call_request.id))),
                                status_callback_method='POST',
                                if_machine='Hangup')
 
