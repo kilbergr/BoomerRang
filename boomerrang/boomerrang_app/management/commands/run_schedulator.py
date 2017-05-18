@@ -39,7 +39,8 @@ class Command(BaseCommand):
 
             call = Call.objects.create(
                 call_time=timezone.now(),
-                call_request=request)
+                call_request=request,
+                success=True)
 
             make_call(request)
             call.save()

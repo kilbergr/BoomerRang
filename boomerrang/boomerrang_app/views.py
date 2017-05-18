@@ -56,6 +56,9 @@ def index(request):
                     time_scheduled=time_scheduled_obj,
                     call_completed=False,)
 
+                messages.success(request, 'Call scheduled!')
+                log.info('Scheduled a call between {} and {}'.format(
+                    new_call_request.source_num, new_call_request.target_num))
                 # Scheduler runs here, determines which calls to make
                 # try:
                 #     view_helpers.make_call(new_call_request)
