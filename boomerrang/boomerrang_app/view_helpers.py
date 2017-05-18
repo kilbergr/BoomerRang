@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+from django.core.exceptions import MiddlewareNotUsed
+>>>>>>> tests for call_status route and call obj creation
 from email.utils import parsedate_to_datetime
 import logging
 import os
@@ -59,36 +63,34 @@ def launch_call_process(call_request):
     make_call(call_request)
 
 
-def record_call_status(request, related_cr):
-  # Create dict to hold information of interest from call status response
-  call_status_info = {}
-  import ipdb; ipdb.set_trace()
+def _record_call_status(request, related_cr):
+    # Create dict to hold information of interest from call status response
+    call_status_info = {}
 
-  # Retrieve information we need to determine success of call
-  # CallDuration will return the duration in seconds
-  status_entries = ['CallStatus', 'Timestamp', 'AnsweredBy']
-  for entry in status_entries:
-      call_status_info[entry] = request.GET[entry]
+    # Retrieve information we need to determine success of call
+    # CallDuration will return the duration in seconds
+    status_entries = ['CallStatus', 'Timestamp', 'AnsweredBy']
+    # TODO: (rebecca) This can fail in the case of an invalid request--currently will fail in view
+    # Should it fail here as well and just bubble up? Input desired
+    for entry in status_entries:
+        call_status_info[entry] = request.GET[entry]
 
-  # Set Timestamp entry to datetime obj instead of RFC 2822
-  call_status_info['Timestamp'] = parsedate_to_datetime(call_status_info['Timestamp'])
+    # Set Timestamp entry to datetime obj instead of RFC 2822
+    call_status_info['Timestamp'] = parsedate_to_datetime(call_status_info['Timestamp'])
 
-  # Check whether call was completed by a human (success metric)
-  if call_status_info['CallStatus']=='completed' and call_status_info['AnsweredBy']=='human':
-      # Save call duration and set the related CallRequest.call_completed to True if so
-      call_status_info['CallDuration'] = request.GET['CallDuration']
-      success = True
-      related_cr.call_completed = True
-      related_cr.save()
-  else:
-      # Save call duration as 0 and log miss, do not change related CallRequest's call_completed
-      call_status_info['CallDuration'] = 0
-      err_msg = 'Call ended with {} status, answered by {}'
-      log.error(err_msg.format(call_status_info['CallStatus'], call_status_info['AnsweredBy']))
-      success = False
+    # Check whether call was completed by a human (success metric)
+    if call_status_info['CallStatus']=='completed' and call_status_info['AnsweredBy']=='human':
+        # Save call duration and set the related CallRequest.call_completed to True if so
+        call_status_info['CallDuration'] = request.GET['CallDuration']
+        call_status_info['Success'] = True
+        related_cr.call_completed = True
+        related_cr.save()
+    else:
+        # Save call duration as 0 and log miss, do not change related CallRequest's call_completed
+        # TODO: (rebecca): Should 0 be saved as int or string? Parsed as string from request
+        call_status_info['CallDuration'] = 0
+        call_status_info['Success'] = False
+        err_msg = 'Call ended with {} status, answered by {}'
+        log.error(err_msg.format(call_status_info['CallStatus'], call_status_info['AnsweredBy']))
 
-  # Create a new call object recording information
-  new_call_obj = Call.objects.create(call_time=call_status_info['Timestamp'],
-                             success=success,
-                             duration=call_status_info['CallDuration'],
-                             call_request=related_cr,)
+    return call_status_info
