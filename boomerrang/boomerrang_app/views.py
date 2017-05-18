@@ -57,16 +57,16 @@ def index(request):
                     call_completed=False,)
 
                 # Scheduler runs here, determines which calls to make
-                try:
-                    view_helpers.make_call(new_call_request)
-                    messages.success(request, 'Call incoming!')
-                    log.info('Call initiated to source - {}'.format(
-                        new_call_request.source_num))
+                # try:
+                #     view_helpers.make_call(new_call_request)
+                #     messages.success(request, 'Call incoming!')
+                #     log.info('Call initiated to source - {}'.format(
+                #         new_call_request.source_num))
 
-                except Exception as e:
-                    err_msg = 'Call unable to be initiated to source: {}, {}'
-                    log.error(err_msg.format(new_call_request.source_num, e))
-                    return redirect('index')
+                # except Exception as e:
+                #     err_msg = 'Call unable to be initiated to source: {}, {}'
+                #     log.error(err_msg.format(new_call_request.source_num, e))
+                #     return redirect('index')
             else:
                 messages.error(
                     request,
