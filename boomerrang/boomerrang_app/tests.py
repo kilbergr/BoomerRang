@@ -88,7 +88,7 @@ class ViewTests(unittest.TestCase):
         # Given: PhoneNumber and date time objects
         source_num = PhoneNumber.from_string('+15105005000')
         target_num = PhoneNumber.from_string('+14155005000')
-        time_scheduled = datetime.now().strftime('%m-%d-%Y')
+        time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
 
         form_data = {
             'source_num': source_num,
@@ -105,7 +105,7 @@ class ViewTests(unittest.TestCase):
         # Given: Invalid PhoneNumber and date time objects
         source_num = PhoneNumber.from_string('+15105005000')
         target_num = PhoneNumber.from_string('+1415500000')
-        time_scheduled = datetime.now().strftime('%m-%d-%Y')
+        time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
 
         form_data = {
             'source_num': source_num,
@@ -140,7 +140,7 @@ class ViewTests(unittest.TestCase):
         # Given: valid PhoneNumber and datetime objects
         source_num = PhoneNumber.from_string('+15105005000')
         target_num = PhoneNumber.from_string('+14155005000')
-        time_scheduled = datetime.now().strftime('%m-%d-%Y')
+        time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
 
         form_data = {
             'source_num': source_num,
@@ -200,7 +200,7 @@ class ViewHelpersTests(unittest.TestCase):
     @patch.dict(os.environ, FAKE_TWILIO_CONFIG_DICT)
     def test_make_call_places_call(self, mock_calls):
         # Given: A call_req with a valid and available twilio number
-        time_scheduled = datetime.now().strftime('%m-%d-%Y')
+        time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
         org = Org(username='boblah', password='blah')
         call_req = CallRequest(
             source_num='+15005550006', target_num='+15005550006',
