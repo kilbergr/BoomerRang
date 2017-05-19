@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from django.test import Client
-from django.utils import timezone
 import os
-import unittest
 from unittest.mock import patch
 from urllib.parse import urljoin
 
+import django
+from django.test import Client
+from django.utils import timezone
 from phonenumber_field.phonenumber import PhoneNumber
 
 from boomerrang.boomerrang_app.models import Org, CallRequest, Call
@@ -21,7 +21,7 @@ FAKE_TWILIO_CONFIG_DICT = {
 }
 
 
-class ModelTests(unittest.TestCase):
+class ModelTests(django.test.TestCase):
 
     def setUp(self):
         self.client = Client()
@@ -70,7 +70,7 @@ class ModelTests(unittest.TestCase):
             call_request.save()
 
 
-class ViewTests(unittest.TestCase):
+class ViewTests(django.test.TestCase):
 
     def setUp(self):
         self.client = Client()
@@ -185,7 +185,7 @@ class ViewTests(unittest.TestCase):
         # TODO: (Rebecca) Needs views tests that test Twilio
 
 
-class ViewHelpersTests(unittest.TestCase):
+class ViewHelpersTests(django.test.TestCase):
 
     @patch.dict(os.environ, FAKE_TWILIO_CONFIG_DICT)
     def test_load_twilio_config(self):
