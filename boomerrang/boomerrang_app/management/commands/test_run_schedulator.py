@@ -96,7 +96,7 @@ class RunSchedulatorTests(django.test.TestCase):
         Call.objects.create(
             call_time=timezone.now(),
             success=True,
-            duration=None,
+            duration=42,
             call_request=request).save()
 
         # When: Schedulator 9000 is run
@@ -120,7 +120,7 @@ class RunSchedulatorTests(django.test.TestCase):
             Call.objects.create(
                 call_time=timezone.now(),
                 success=False,
-                duration=None,
+                duration=42,
                 call_request=request).save()
 
         # When: Schedulator 9000 is run

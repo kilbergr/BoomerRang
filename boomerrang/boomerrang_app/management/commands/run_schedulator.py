@@ -33,14 +33,12 @@ class Command(BaseCommand):
             unfailed_calls = [(call.success or call.success is None)
                               for call in request.calls.all()]
             if any(unfailed_calls):
-                info_msg = 'This call request has calls that were successful or are currently in progress.'
-                log.info(info_msg)
                 continue
 
             call = Call.objects.create(
                 call_time=timezone.now(),
                 call_request=request,
-                success=True)
+                success=None)
 
             make_call(request)
             call.save()
