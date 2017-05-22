@@ -71,8 +71,7 @@ def _record_call_status(request, related_cr):
     # Retrieve information we need to determine success of call
     # CallDuration will return the duration in seconds
     status_entries = ['CallStatus', 'Timestamp', 'AnsweredBy']
-    # TODO: (rebecca) This can fail in the case of an invalid request--currently will fail in view
-    # Should it fail here as well and just bubble up? Input desired
+
     for entry in status_entries:
         call_status_info[entry] = request.GET[entry]
 
@@ -88,7 +87,6 @@ def _record_call_status(request, related_cr):
         related_cr.save()
     else:
         # Save call duration as 0 and log miss, do not change related CallRequest's call_completed
-        # TODO: (rebecca): Should 0 be saved as int or string? Parsed as string from request
         call_status_info['CallDuration'] = 0
         call_status_info['Success'] = False
         err_msg = 'Call ended with {} status, answered by {}'

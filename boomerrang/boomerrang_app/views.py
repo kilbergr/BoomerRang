@@ -125,6 +125,7 @@ def call_status(request, call_req_id, call_id):
             duration=call_status_info['CallDuration'])
 
     except KeyError as e:
+        # Update call success to False if fails anywhere in this process
         Call.objects.filter(id=call_id).update(
             success=False)
         log.error('No call status information at this time.')
