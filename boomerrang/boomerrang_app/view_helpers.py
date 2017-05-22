@@ -28,7 +28,7 @@ def load_twilio_config():
     return (twilio_number, twilio_account_sid, twilio_auth_token)
 
 
-def make_call(call_request):
+def make_call(call_request, call_id):
     # Load our Twilio credentials
     twilio_number, twilio_account_sid, twilio_auth_token = load_twilio_config()
     # Create Twilio client
@@ -50,7 +50,8 @@ def make_call(call_request):
                                   target_num),
                                method='GET',
                                status_callback=urljoin(os.environ.get('CALL_STATUS_URL'),
-                                                       '{}/'.format(str(call_request.id))),
+                                                       '{0!s}/{1!s}'.format(
+                                                            call_request.id, call_id)),
                                status_callback_method='POST',
                                if_machine='Hangup')
 
@@ -79,7 +80,7 @@ def _record_call_status(request, related_cr):
     call_status_info['Timestamp'] = parsedate_to_datetime(call_status_info['Timestamp'])
 
     # Check whether call was completed by a human (success metric)
-    if call_status_info['CallStatus']=='completed' and call_status_info['AnsweredBy']=='human':
+    if call_status_info['CallStatus'] == 'completed' and call_status_info['AnsweredBy'] == 'human':
         # Save call duration and set the related CallRequest.call_completed to True if so
         call_status_info['CallDuration'] = request.GET['CallDuration']
         call_status_info['Success'] = True

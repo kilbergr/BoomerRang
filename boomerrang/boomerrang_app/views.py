@@ -92,8 +92,7 @@ def outbound(request, target_num):
     try:
         response = twiml.Response()
         response.say("Hello, you'll be connected momentarily to your "
-                     "representative, Senator Feinstein, via Boomerrang. "
-                     "Bai Felicia.",
+                     "representative, Senator Feinstein, via Boomerrang.",
                      voice='alice', language='en-EN')
         log.info('Automated message delivered to source number.')
 
@@ -110,22 +109,24 @@ def outbound(request, target_num):
 
 
 @csrf_exempt
-def call_status(request, call_req_id):
+def call_status(request, call_req_id, call_id):
     # Identify related call_request
     related_cr = CallRequest.objects.get(id=call_req_id)
 
     try:
         # Gather information about call
-        call_status_info = view_helpers._record_call_status(request, related_cr)
+        call_status_info = view_helpers._record_call_status(
+            request, related_cr)
 
-        # Create a new call object recording information
-        new_call_obj = Call.objects.create(
+        # Update the relevant call object recording information
+        Call.objects.filter(id=call_id).update(
             call_time=call_status_info['Timestamp'],
             success=call_status_info['Success'],
-            duration=call_status_info['CallDuration'],
-            call_request=related_cr,)
+            duration=call_status_info['CallDuration'])
 
     except KeyError as e:
+        Call.objects.filter(id=call_id).update(
+            success=False)
         log.error('No call status information at this time.')
 
     return HttpResponse(status=200)

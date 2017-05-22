@@ -155,22 +155,12 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
-        # 'file': {
-        #     'level': 'DEBUG',
-        #     'class': 'logging.FileHandler',
-        #     'filename': 'debug.log',
-        # },
     },
     'loggers': {
         'boom_logger': {
             'handlers': ['console'],
             'level': 'DEBUG',
         },
-        # 'django': {
-        #     'handlers': ['file'],
-        #     'level': 'DEBUG',
-        #     'propagate': True,
-        # },
     },
 }
 
