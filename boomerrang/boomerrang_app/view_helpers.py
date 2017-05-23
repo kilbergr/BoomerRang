@@ -1,10 +1,12 @@
-from django.core.exceptions import MiddlewareNotUsed
 import logging
 import os
+from twilio.rest import Client
 from urllib.parse import urljoin
 
-from twilio.rest import Client
+from django.core.exceptions import MiddlewareNotUsed
+from django.utils import timezone
 
+from boomerrang.boomerrang_app.models import Call
 
 # Setup logging
 log = logging.getLogger('boom_logger')
@@ -41,3 +43,10 @@ def make_call(call_request):
                                to=source_num,
                                url=urljoin(os.environ.get('OUTBOUND_URL'),
                                            target_num),)
+
+def launch_call_process(call_request):
+    call = Call.objects.create(
+        call_time=timezone.now(),
+        call_request=call_request,
+        success=None)
+    make_call(call_request)

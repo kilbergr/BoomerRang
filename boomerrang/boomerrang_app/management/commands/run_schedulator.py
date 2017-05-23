@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from boomerrang.boomerrang_app.models import CallRequest, Call
-from boomerrang.boomerrang_app.view_helpers import make_call
+from boomerrang.boomerrang_app.view_helpers import make_call, launch_call_process
 
 log = logging.getLogger('boom_logger')
 
@@ -35,12 +35,6 @@ class Command(BaseCommand):
             if any(unfailed_calls):
                 continue
 
-            call = Call.objects.create(
-                call_time=timezone.now(),
-                call_request=request,
-                success=None)
-
-            make_call(request)
-            call.save()
+            launch_call_process(request)
             info_msg = 'A call has been made via the schedulator.'
             log.info(info_msg)
