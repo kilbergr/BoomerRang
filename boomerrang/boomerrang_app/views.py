@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta
+from datetime import timedelta, datetime, timezone
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -64,6 +64,8 @@ def index(request):
 
                 if 'callnow' in request.POST:
                     # If user calls now
+                    new_call_request.time_scheduled = datetime.now(timezone.utc)
+                    new_call_request.save()
                     view_helpers.launch_call_process(new_call_request)
                     messages.success(request, 'Call incoming!')
                     log.info('Call occurring now between {} and {}'.format(
