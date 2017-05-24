@@ -55,3 +55,9 @@ The app requires environment variables to be set with your Twilio account keys a
 	* If you see this: `django.core.exceptions.ImproperlyConfigured: settings.DATABASES is improperly configured. Please supply the ENGINE value. Check settings documentation for more details.`, run this in your terminal:
 	`export DATABASE_URL=postgres://127.0.0.1:5432/boomerang_db`. This sets the environmental variable locally that django needs to look to the local postgres database.
 4. Point your browser to: <http://127.0.0.1:4567> to see things.
+
+## Testing:
+
+1. To run tests, simply run `python manage.py test` from your BoomerRang env
+2. To determine test coverage, run `coverage run --source boomerrang manage.py test` from your BoomerRang env. Then run either `coverage report` to see coverage in your terminal. If you'd like to see which lines are covered or view coverage in your browser, run `coverage html` then `open htmlcov/index.html`. From there you can click around to the different files to see where test coverage is lacking.
+
