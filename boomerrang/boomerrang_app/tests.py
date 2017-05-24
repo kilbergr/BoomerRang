@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timezone
-from django.core.exceptions import MiddlewareNotUsed
-from django.db.utils import IntegrityError
-from django.test import Client, RequestFactory
 import os
 from unittest.mock import patch
 from urllib.parse import urljoin, urlencode
 
-import django
 from django.core.exceptions import MiddlewareNotUsed
 from django.db.utils import IntegrityError
-from django.test import Client
+from django.test import Client, RequestFactory, TestCase
 from django.utils import timezone
 from phonenumber_field.phonenumber import PhoneNumber
 
@@ -102,7 +98,7 @@ def _create_call_obj(call_req_id, id_num):
     return call
 
 
-class ModelTests(django.test.TestCase):
+class ModelTests(TestCase):
 
     def setUp(self):
         self.client = Client()
@@ -160,7 +156,7 @@ class ModelTests(django.test.TestCase):
             call_request2 = _create_call_req(1)
 
 
-class ViewTests(django.test.TestCase):
+class ViewTests(TestCase):
 
     def setUp(self):
         self.client = Client()
@@ -323,7 +319,6 @@ class ViewTests(django.test.TestCase):
         self.assertEqual(Call.objects.get(id=call.id).success, True)
         self.assertEqual(response.status_code, 200)
 
-
     def test_machine_answer_updates_unsuccessful_call_obj(self):
         # Given: No call objects
         self.assertEqual(len(Call.objects.all()), 0)
@@ -364,7 +359,7 @@ class ViewTests(django.test.TestCase):
         self.assertFalse(CallRequest.objects.get(id=3).call_completed)
 
 
-class ViewHelpersTests(django.test.TestCase):
+class ViewHelpersTests(TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()

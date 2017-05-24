@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-from django.core.exceptions import MiddlewareNotUsed
->>>>>>> tests for call_status route and call obj creation
 from email.utils import parsedate_to_datetime
 import logging
 import os
@@ -61,7 +57,7 @@ def launch_call_process(call_request):
         call_time=timezone.now(),
         call_request=call_request,
         success=None)
-    make_call(call_request)
+    make_call(call_request, call.id)
 
 
 def _record_call_status(request, related_cr):
