@@ -44,6 +44,7 @@ def make_call(call_request):
                                url=urljoin(os.environ.get('OUTBOUND_URL'),
                                            target_num),)
 
+
 def launch_call_process(call_request):
     call = Call.objects.create(
         call_time=timezone.now(),
