@@ -136,27 +136,58 @@ class ViewTests(django.test.TestCase):
         self.assertFalse(form.is_valid())
 
     @patch.object(view_helpers.Client, 'calls', autospec=True)
-    def test_valid_form_can_post_and_create_call_request(self, mock_calls):
+    def test_valid_form_can_post_and_create_scheduled_call_request(self, mock_calls):
         # Given: valid PhoneNumber and datetime objects
         source_num = PhoneNumber.from_string('+15105005000')
         target_num = PhoneNumber.from_string('+14155005000')
         time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
 
-        form_data = {
+        page_data = {
             'source_num': source_num,
             'target_num': target_num,
             'time_scheduled': time_scheduled,
+            'schedule': 'Schedule Call'
         }
 
-        # When the form is posted
-        self.client.post('/', data=form_data)
+        # When the form is posted to schedule path
+        self.client.post('/', data=page_data)
 
-        call_req = CallRequest.objects.filter(
+        call_req = CallRequest.objects.get(
             source_num='+15105005000',
             target_num='+14155005000',)
+
         # The resulting call_request object will contain expected data
-        self.assertEqual(call_req[0].source_num, source_num)
-        self.assertEqual(call_req[0].target_num, target_num)
+        self.assertEqual(call_req.source_num, source_num)
+        self.assertEqual(call_req.target_num, target_num)
+        # No calls would have been created
+        self.assertEqual(len(Call.objects.all()), 0)
+
+    @patch.object(view_helpers.Client, 'calls', autospec=True)
+    def test_valid_form_can_post_and_create_call_now_request(self, mock_calls):
+        # Given: valid PhoneNumber and datetime objects
+        source_num = PhoneNumber.from_string('+15105005000')
+        target_num = PhoneNumber.from_string('+14155005000')
+        time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
+
+        page_data = {
+            'source_num': source_num,
+            'target_num': target_num,
+            'time_scheduled': time_scheduled,
+            'callnow': 'Call Now'
+        }
+
+        # When the form is posted to schedule path
+        self.client.post('/', data=page_data)
+
+        call_req = CallRequest.objects.get(
+            source_num='+15105005000',
+            target_num='+14155005000',)
+
+        # The resulting call_request object will contain expected data
+        self.assertEqual(call_req.source_num, source_num)
+        self.assertEqual(call_req.target_num, target_num)
+        # A call would have been created
+        self.assertEqual(len(Call.objects.all()), 1)
 
     @patch.object(view_helpers.Client, 'calls', autospec=True)
     def test_invalid_form_cannot_post_or_create_call_request(self, mock_calls):
@@ -165,14 +196,15 @@ class ViewTests(django.test.TestCase):
         target_num = PhoneNumber.from_string('+14155005000')
         time_scheduled = datetime.now()
 
-        form_data = {
+        page_data = {
             'source_num': source_num,
             'target_num': target_num,
             'time_scheduled': time_scheduled,
+            'schedule': 'Schedule Call'
         }
 
         # When the invalid form is posted
-        self.client.post('/', data=form_data)
+        self.client.post('/', data=page_data)
         # Then a call will not be created
         self.assertEqual(mock_calls.create.call_count, 0)
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta
+from datetime import timedelta, datetime, timezone
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -56,9 +56,20 @@ def index(request):
                     time_scheduled=time_scheduled_obj,
                     call_completed=False,)
 
-                messages.success(request, 'Call scheduled!')
-                log.info('Scheduled a call between {} and {}'.format(
-                    new_call_request.source_num, new_call_request.target_num))
+                if 'schedule' in request.POST:
+                    # If user schedules call in the future
+                    messages.success(request, 'Call scheduled!')
+                    log.info('Scheduled a call between {} and {}'.format(
+                        new_call_request.source_num, new_call_request.target_num))
+
+                if 'callnow' in request.POST:
+                    # If user calls now
+                    new_call_request.time_scheduled = datetime.now(timezone.utc)
+                    new_call_request.save()
+                    view_helpers.launch_call_process(new_call_request)
+                    messages.success(request, 'Call incoming!')
+                    log.info('Call occurring now between {} and {}'.format(
+                        new_call_request.source_num, new_call_request.target_num))
 
             else:
                 messages.error(
