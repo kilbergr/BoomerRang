@@ -9,3 +9,9 @@ class BoomForm(forms.ModelForm):
     class Meta:
         model = CallRequest
         fields = ('source_num', 'target_num', 'time_scheduled')
+
+    def __init__(self, *args, **kwargs):
+        super(BoomForm, self).__init__(*args, **kwargs)
+        self.fields['source_num'].label = "Your number"
+        self.fields['target_num'].label = "Call number"
+        self.fields['time_scheduled'].label = "When would you like to receive call? "
