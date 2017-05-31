@@ -39,22 +39,31 @@ BoomerRang is an API that advocacy organizations can use to connect citizens wit
 
 The app requires environment variables to be set with your Twilio account keys and number.
 
-## To set environment variables locally, create a file called `.env` here, with the following variables set with twilio test account values:
+## To set environment variables locally, create a file called `.env` here, with the twilio variables and the ngrok url resulting from running ngrok:
 
-	TWILIO_ACCOUNT_SID=<TEST_ACCOUNT_SID>
-	TWILIO_AUTH_TOKEN=<TEST_AUTH_TOKEN>
+	TWILIO_ACCOUNT_SID=<TWILIO_ACCOUNT_SID>
+	TWILIO_AUTH_TOKEN=<TWILIO_AUTH_TOKEN>
 	TWILIO_NUMBER=<+15555555555>
+	OUTBOUND_URL='http://<NGROKURL>.ngrok.io/outbound/'
+	CALL_STATUS_URL='http://<NGROKURL>.ngrok.io/call-status/'
 
-## Running the app:
+* Note: If you are running with Twilio TEST credentials, you must use the Twilio TEST phone number (+15005550006). If you run the app with real Twilio credentials, you should use a real Twilio number provisioned for this app.
+
+## Running the app locally:
 
 1. To manually start the postgres server, run `pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start`.
 	* Note: to have postgres automatically run at login, run `ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents`.
-2. To run ngrok on port 4567, run `ngrok http 4567` in one terminal tab.
+2. To run ngrok on port 4567, run `ngrok http 4567` in a terminal tab.
     * Note: ngrok must be running on the same port as django.
-3. To run the server on port 4567, run `python manage.py runserver 4567` in a separate terminal tab.
+3. In the terminal window where you've run ngrok, you'll see a session status with information. Find the forwarding url (will look like `Forwarding http://4af77496.ngrok.io -> localhost:4567`). Take that url and save it in your .env file in the outbound and call status urls (with the appropriate path). This will end up looking something like:  
+`OUTBOUND_URL='http://4af77496.ngrok.io/outbound/'
+CALL_STATUS_URL='http://4af77496.ngrok.io/call-status/'`.
+You must do this BEFORE running the server.
+4. Go to the Twilio console (under Home / Phone Numbers / Manage Numbers / Active Numbers /) in the Configure tab. Change the webhook urls under primary handler fails and call status change to match the ngrok urls in your .env file.
+5. To run the server on port 4567, run `python manage.py runserver 4567` in a separate terminal tab.
 	* If you see this: `django.core.exceptions.ImproperlyConfigured: settings.DATABASES is improperly configured. Please supply the ENGINE value. Check settings documentation for more details.`, run this in your terminal:
 	`export DATABASE_URL=postgres://127.0.0.1:5432/boomerang_db`. This sets the environmental variable locally that django needs to look to the local postgres database.
-4. Point your browser to: <http://127.0.0.1:4567> to see things.
+6. Point your browser to: <http://127.0.0.1:4567> to see BoomerRang.
 
 ## Testing:
 
