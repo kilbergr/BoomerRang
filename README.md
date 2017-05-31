@@ -39,13 +39,15 @@ BoomerRang is an API that advocacy organizations can use to connect citizens wit
 
 The app requires environment variables to be set with your Twilio account keys and number.
 
-## To set environment variables locally, create a file called `.env` here, with the twilio variables set with twilio test account values and the ngrok url resulting from running ngrok:
+## To set environment variables locally, create a file called `.env` here, with the twilio variables and the ngrok url resulting from running ngrok:
 
-	TWILIO_ACCOUNT_SID=<TEST_ACCOUNT_SID>
-	TWILIO_AUTH_TOKEN=<TEST_AUTH_TOKEN>
+	TWILIO_ACCOUNT_SID=<TWILIO_ACCOUNT_SID>
+	TWILIO_AUTH_TOKEN=<TWILIO_AUTH_TOKEN>
 	TWILIO_NUMBER=<+15555555555>
 	OUTBOUND_URL='http://<NGROKURL>.ngrok.io/outbound/'
 	CALL_STATUS_URL='http://<NGROKURL>.ngrok.io/call-status/'
+
+* Note: If you are running with Twilio TEST credentials, you must use the Twilio TEST phone number (+15005550006). If you run the app with real Twilio credentials, you should use a real Twilio number provisioned for this app.
 
 ## Running the app locally:
 
@@ -57,7 +59,7 @@ The app requires environment variables to be set with your Twilio account keys a
 `OUTBOUND_URL='http://4af77496.ngrok.io/outbound/'
 CALL_STATUS_URL='http://4af77496.ngrok.io/call-status/'`.
 You must do this BEFORE running the server.
-4. Go to the Twilio console (under Home / Phone Numbers / Manage Numbers / Active Numbers /) in the Configure tab. Change the webhook urls under primary hander fails and call status change to match the ngrok urls in your .env file.
+4. Go to the Twilio console (under Home / Phone Numbers / Manage Numbers / Active Numbers /) in the Configure tab. Change the webhook urls under primary handler fails and call status change to match the ngrok urls in your .env file.
 5. To run the server on port 4567, run `python manage.py runserver 4567` in a separate terminal tab.
 	* If you see this: `django.core.exceptions.ImproperlyConfigured: settings.DATABASES is improperly configured. Please supply the ENGINE value. Check settings documentation for more details.`, run this in your terminal:
 	`export DATABASE_URL=postgres://127.0.0.1:5432/boomerang_db`. This sets the environmental variable locally that django needs to look to the local postgres database.
