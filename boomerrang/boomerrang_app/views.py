@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta, datetime, timezone
 from django.contrib import messages
+from django.db.utils import IntegrityError
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -10,7 +11,7 @@ import logging
 from twilio import twiml
 
 from boomerrang.boomerrang_app.forms import BoomForm
-from boomerrang.boomerrang_app.models import CallRequest, Org
+from boomerrang.boomerrang_app.models import CallRequest, Org, Call
 from boomerrang.boomerrang_app import view_helpers
 
 # Setup logging
@@ -49,12 +50,18 @@ def index(request):
             # target in 24 hours.
             if len(existing_requests) < _NUM_ALLOWED_CALLS:
                 # Make new call request object
-                new_call_request = CallRequest.objects.create(
-                    source_num=source_num_obj,
-                    target_num=target_num_obj,
-                    org=fake_org,
-                    time_scheduled=time_scheduled_obj,
-                    call_completed=False,)
+                try:
+                    new_call_request = CallRequest.objects.create(
+                        source_num=source_num_obj,
+                        target_num=target_num_obj,
+                        org=fake_org,
+                        time_scheduled=time_scheduled_obj,
+                        call_completed=False,)
+                except IntegrityError as e:
+                    err_msg = 'This is a duplicate call request and will not be completed, {}.'
+                    log.error(err_msg.format(e))
+                    messages.error(request, err_msg)
+                    return redirect('index')
 
                 if 'schedule' in request.POST:
                     # If user schedules call in the future
@@ -85,8 +92,7 @@ def outbound(request, target_num):
     try:
         response = twiml.Response()
         response.say("Hello, you'll be connected momentarily to your "
-                     "representative, Senator Feinstein, via Boomerrang. "
-                     "Bai Felicia.",
+                     "representative, Senator Feinstein, via Boomerrang.",
                      voice='alice', language='en-EN')
         log.info('Automated message delivered to source number.')
 
@@ -100,3 +106,28 @@ def outbound(request, target_num):
     log.info('Call to {} successful!'.format(target_num))
 
     return HttpResponse(response)
+
+
+@csrf_exempt
+def call_status(request, call_req_id, call_id):
+    # Identify related call_request
+    related_cr = CallRequest.objects.get(id=call_req_id)
+
+    try:
+        # Gather information about call
+        call_status_info = view_helpers._record_call_status(
+            request, related_cr)
+
+        # Update the relevant call object recording information
+        Call.objects.filter(id=call_id).update(
+            call_time=call_status_info['Timestamp'],
+            success=call_status_info['Success'],
+            duration=call_status_info['CallDuration'])
+
+    except KeyError as e:
+        # Update call success to False if fails anywhere in this process
+        Call.objects.filter(id=call_id).update(
+            success=False)
+        log.error('No call status information at this time.')
+
+    return HttpResponse(status=200)
