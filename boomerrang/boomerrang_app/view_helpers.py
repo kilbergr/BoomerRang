@@ -7,7 +7,7 @@ from urllib.parse import urljoin
 from django.core.exceptions import MiddlewareNotUsed
 from django.utils import timezone
 
-from boomerrang.boomerrang_app.models import Call
+from boomerrang.boomerrang_app.models import Call, PhoneNumber
 
 # Setup logging
 log = logging.getLogger('boom_logger')
@@ -33,8 +33,8 @@ def make_call(call_request, call_id):
     except Exception as e:
         log.error(e)
 
-    source_num = '+{}{}'.format(call_request.source_num.country_code,
-                                call_request.source_num.national_number)
+    source_num = '+{}{}'.format(call_request.source_num.number.country_code,
+                                call_request.source_num.number.national_number)
     # Needs trailing / for URL
     target_num = '+{}{}/'.format(call_request.target_num.country_code,
                                  call_request.target_num.national_number)

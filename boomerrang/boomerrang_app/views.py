@@ -11,7 +11,7 @@ import logging
 from twilio import twiml
 
 from boomerrang.boomerrang_app.forms import BoomForm
-from boomerrang.boomerrang_app.models import CallRequest, Org, Call
+from boomerrang.boomerrang_app.models import CallRequest, Org, Call, PhoneNumber
 from boomerrang.boomerrang_app import view_helpers
 
 # Setup logging
@@ -32,6 +32,9 @@ def index(request):
             target_num_obj = form.cleaned_data['target_num']
             time_scheduled_obj = form.cleaned_data['time_scheduled']
 
+            # Retrieve or create a phone number obj from source_num form information
+            (source_num, _) = PhoneNumber.objects.get_or_create(number=source_num_obj)
+
             # Todo (rebecca) should retrieve org object from page info or user
             # info
             fake_org = Org.objects.get_or_create(
@@ -39,7 +42,7 @@ def index(request):
             past_cutoff = time_scheduled_obj - timedelta(hours=12)
             future_cutoff = time_scheduled_obj + timedelta(hours=12)
             existing_requests = CallRequest.objects.filter(
-                source_num=source_num_obj,
+                source_num=source_num,
                 target_num=target_num_obj,
                 org=fake_org,
                 time_scheduled__gte=past_cutoff,
@@ -49,10 +52,11 @@ def index(request):
             # Ensure this person is not placing too many calls to the same
             # target in 24 hours.
             if len(existing_requests) < _NUM_ALLOWED_CALLS:
+
                 # Make new call request object
                 try:
                     new_call_request = CallRequest.objects.create(
-                        source_num=source_num_obj,
+                        source_num=source_num,
                         target_num=target_num_obj,
                         org=fake_org,
                         time_scheduled=time_scheduled_obj,

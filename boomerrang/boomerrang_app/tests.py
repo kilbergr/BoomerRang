@@ -8,11 +8,11 @@ from django.core.exceptions import MiddlewareNotUsed
 from django.db.utils import IntegrityError
 from django.test import Client, RequestFactory, TestCase
 from django.utils import timezone
-from phonenumber_field.phonenumber import PhoneNumber
+from phonenumber_field.phonenumber import PhoneNumber as ModelPhoneNumber
 
 from boomerrang.boomerrang_app import view_helpers
 from boomerrang.boomerrang_app.forms import BoomForm
-from boomerrang.boomerrang_app.models import Org, CallRequest, Call
+from boomerrang.boomerrang_app.models import Org, CallRequest, Call, PhoneNumber
 from boomerrang.boomerrang_app.views import call_status
 
 FAKE_ENV_VAR_DICT = {
@@ -78,8 +78,10 @@ def _construct_callback_url(id_num, answered_by, duration):
 
 def _create_call_req(id_num):
     org = Org.objects.create(username='boblah', password='blah')
+    source_num = PhoneNumber.objects.create(
+         number=ModelPhoneNumber.from_string('+15105005006'))
     call_req = CallRequest.objects.create(
-        source_num='+15005550006',
+        source_num=source_num,
         target_num='+15005550006',
         time_scheduled=datetime(1989, 7, 20, 18, 30, 43, tzinfo=timezone.utc),
         org=org,
@@ -107,11 +109,13 @@ class ModelTests(TestCase):
         # Given: Two org objects
         org = Org.objects.create(username='boblah', password='blah')
         org2 = Org.objects.create(username='org2', password='pw2')
+        source_num = PhoneNumber.objects.create(
+            number=ModelPhoneNumber.from_string('+15105005000'))
 
         # And: A call_req with a valid and available twilio number is
         # associated with one of them
         call_req = CallRequest(
-            source_num='+15005550006', target_num='+15005550006', org=org)
+            source_num=source_num, target_num='+15005550006', org=org)
 
         # When: Call_req obj is examined
         # Then: Expected org should be on call_request obj
@@ -132,11 +136,13 @@ class ModelTests(TestCase):
     def test_callrequest_must_have_org_to_save(self):
         # Given: A CallRequest object without an Org
         call_time = timezone.now()
+        source_num = PhoneNumber.objects.create(
+            number=ModelPhoneNumber.from_string('+15105005000'))
 
         # When: CallRequest obj is created with a valid & available twilio
         # number
         call_request = CallRequest(
-            source_num='15005550006',
+            source_num=source_num,
             target_num='15005550006',
             time_scheduled=call_time
         )
@@ -173,8 +179,8 @@ class ViewTests(TestCase):
 
     def test_form_valid(self):
         # Given: PhoneNumber and date time objects
-        source_num = PhoneNumber.from_string('+15105005000')
-        target_num = PhoneNumber.from_string('+14155005000')
+        source_num = ModelPhoneNumber.from_string('+15105005000')
+        target_num = ModelPhoneNumber.from_string('+14155005000')
         time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
 
         form_data = {
@@ -190,8 +196,8 @@ class ViewTests(TestCase):
 
     def test_invalid_phone_number_yields_invalid_form(self):
         # Given: Invalid PhoneNumber and date time objects
-        source_num = PhoneNumber.from_string('+15105005000')
-        target_num = PhoneNumber.from_string('+1415500000')
+        source_num = ModelPhoneNumber.from_string('+15105005000')
+        target_num = ModelPhoneNumber.from_string('+1415500000')
         time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
 
         form_data = {
@@ -207,8 +213,8 @@ class ViewTests(TestCase):
 
     def test_invalid_datetime_yields_invalid_form(self):
         # Given: PhoneNumber and invalid datetime objects
-        source_num = PhoneNumber.from_string('+15105005000')
-        target_num = PhoneNumber.from_string('+14155100000')
+        source_num = ModelPhoneNumber.from_string('+15105005000')
+        target_num = ModelPhoneNumber.from_string('+14155100000')
         time_scheduled = datetime.now().strftime('%Y-%m-%d')
 
         form_data = {
@@ -225,8 +231,8 @@ class ViewTests(TestCase):
     @patch.object(view_helpers.Client, 'calls', autospec=True)
     def test_valid_form_can_post_and_create_scheduled_call_request(self, mock_calls):
         # Given: valid PhoneNumber and datetime objects
-        source_num = PhoneNumber.from_string('+15105005000')
-        target_num = PhoneNumber.from_string('+14155005000')
+        source_num = ModelPhoneNumber.from_string('+15105005000')
+        target_num = ModelPhoneNumber.from_string('+14155005000')
         time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
 
         page_data = {
@@ -238,13 +244,14 @@ class ViewTests(TestCase):
 
         # When the form is posted to schedule path
         self.client.post('/', data=page_data)
-
+        retrieved_source_num = PhoneNumber.objects.get(
+            number=ModelPhoneNumber.from_string('+15105005000'))
         call_req = CallRequest.objects.get(
-            source_num='+15105005000',
+            source_num=retrieved_source_num,
             target_num='+14155005000',)
 
         # The resulting call_request object will contain expected data
-        self.assertEqual(call_req.source_num, source_num)
+        self.assertEqual(call_req.source_num, retrieved_source_num)
         self.assertEqual(call_req.target_num, target_num)
         # No calls would have been created
         self.assertEqual(len(Call.objects.all()), 0)
@@ -252,8 +259,8 @@ class ViewTests(TestCase):
     @patch.object(view_helpers.Client, 'calls', autospec=True)
     def test_valid_form_can_post_and_create_call_now_request(self, mock_calls):
         # Given: valid PhoneNumber and datetime objects
-        source_num = PhoneNumber.from_string('+15105005000')
-        target_num = PhoneNumber.from_string('+14155005000')
+        source_num = ModelPhoneNumber.from_string('+15105005000')
+        target_num = ModelPhoneNumber.from_string('+14155005000')
         time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
 
         page_data = {
@@ -265,13 +272,14 @@ class ViewTests(TestCase):
 
         # When the form is posted to schedule path
         self.client.post('/', data=page_data)
-
+        retrieved_source_num = PhoneNumber.objects.get(
+            number=ModelPhoneNumber.from_string('+15105005000'))
         call_req = CallRequest.objects.get(
-            source_num='+15105005000',
+            source_num=retrieved_source_num,
             target_num='+14155005000',)
 
         # The resulting call_request object will contain expected data
-        self.assertEqual(call_req.source_num, source_num)
+        self.assertEqual(call_req.source_num, retrieved_source_num)
         self.assertEqual(call_req.target_num, target_num)
         # A call would have been created
         self.assertEqual(len(Call.objects.all()), 1)
@@ -279,8 +287,8 @@ class ViewTests(TestCase):
     @patch.object(view_helpers.Client, 'calls', autospec=True)
     def test_invalid_form_cannot_post_or_create_call_request(self, mock_calls):
         # Given: PhoneNumber and invalid date time objects
-        source_num = PhoneNumber.from_string('+15105005000')
-        target_num = PhoneNumber.from_string('+14155005000')
+        source_num = ModelPhoneNumber.from_string('+15105005000')
+        target_num = ModelPhoneNumber.from_string('+14155005000')
         time_scheduled = datetime.now()
 
         page_data = {
@@ -295,8 +303,10 @@ class ViewTests(TestCase):
         # Then a call will not be created
         self.assertEqual(mock_calls.create.call_count, 0)
 
+        source_num_obj = PhoneNumber.objects.create(
+            number=ModelPhoneNumber.from_string('+15105005000'))
         call_req = CallRequest.objects.filter(
-            source_num='+15105005000',
+            source_num=source_num_obj,
             target_num='+14155005000',)
         # And there will be no resulting call_request object
         self.assertEqual(len(call_req), 0)
@@ -404,7 +414,7 @@ class ViewHelpersTests(TestCase):
             call_req.id, call.id))
         mock_calls.create.assert_called_once_with(
             from_=FAKE_ENV_VAR_DICT['TWILIO_NUMBER'],
-            to='+15005550006',
+            to='+15105005006',
             url=outbound_url,
             method='GET',
             status_callback=callstatus_url,

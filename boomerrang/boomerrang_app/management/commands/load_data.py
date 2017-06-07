@@ -3,7 +3,10 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
-from boomerrang.boomerrang_app.models import CallRequest, Org, Call
+from phonenumber_field.phonenumber import PhoneNumber as ModelPhoneNumber
+
+from boomerrang.boomerrang_app.models import CallRequest, Org, Call, PhoneNumber
+
 
 class Command(BaseCommand):
 
@@ -38,24 +41,33 @@ class Command(BaseCommand):
             org1.save()
             org2.save()
 
+            # Add PhoneNumbers
+            number1 = PhoneNumber.objects.create(
+                        number=ModelPhoneNumber.from_string(
+                            '+15555555555'),
+                        validated=None,
+                        blacklisted=False)
+
             # Add CallRequests
             now = timezone.now()
             cr1 = CallRequest.objects.create(
-                    source_num='15555555555',
-                    target_num='15555555555',
+                    source_num=number1,
+                    target_num='+15555555555',
+                    call_completed=True,
                     time_scheduled=now,
                     org=org1
                     )
             cr2 = CallRequest.objects.create(
-                    source_num='15555555555',
-                    target_num='15555555555',
+                    source_num=number1,
+                    target_num='+15555555555',
+                    call_completed=True,
                     time_scheduled=now,
                     org=org2
                     )
             cr1.save()
             cr2.save()
 
-            data = [org1.username, org2.username, cr1, cr2]
+            data = [org1.username, org2.username, number1, cr1, cr2]
 
             self.stdout.write("Data loaded successfully: {}".format(data))
 
@@ -64,6 +76,11 @@ class Command(BaseCommand):
             for cr in call_requests:
                 cr.delete()
                 self.stdout.write('{} deleted'.format(cr))
+
+            numbers = PhoneNumber.objects.all()
+            for num in numbers:
+                num.delete()
+                self.stdout.write('{} deleted'.format(num))
 
             orgs = Org.objects.all()
             for o in orgs:
@@ -75,7 +92,7 @@ class Command(BaseCommand):
                 c.delete()
                 self.stdout.write('{} deleted'.format(c))
 
-            if not call_requests and not orgs and not calls:
+            if not call_requests and not orgs and not calls and not numbers:
                 self.stdout.write("No data to delete.")
 
         else:
