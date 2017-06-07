@@ -10,10 +10,9 @@ from django.test import Client, RequestFactory, TestCase
 from django.utils import timezone
 from phonenumber_field.phonenumber import PhoneNumber as ModelPhoneNumber
 
-from boomerrang.boomerrang_app import view_helpers
+from boomerrang.boomerrang_app import view_helpers, views
 from boomerrang.boomerrang_app.forms import BoomForm
 from boomerrang.boomerrang_app.models import Org, CallRequest, Call, PhoneNumber
-from boomerrang.boomerrang_app.views import call_status
 
 FAKE_ENV_VAR_DICT = {
     'TWILIO_ACCOUNT_SID': 'hi',
@@ -64,6 +63,35 @@ _CALLBACK_STATUS_DICT = {
     'CallDuration': ''
 }
 
+_OUTBOUND_DICT = {
+    'Called': '+15005550006',
+    'ToState': 'NY',
+    'CallerCountry': 'US',
+    'Direction': 'outbound-api',
+    'CallerState': 'CA',
+    'ToZip': '10028',
+    'CallSid': 'CAdfa81b7d24b71e3ec38190794b45011a',
+    'To': '+15005550006',
+    'CallerZip': '94571',
+    'ToCountry': 'US',
+    'ApiVersion': '2010-04-01',
+    'CalledZip': '10028',
+    'CalledCity': 'NEW+YORK',
+    'CallStatus': 'in-progress',
+    'From': '+15107571675',
+    'AccountSid': 'AC8d88ba5085adeac4015ea92ec9a81ded',
+    'CalledCountry': 'US',
+    'CallerCity': 'SAN+FRANCISCO',
+    'Caller': '+15107571675',
+    'FromCountry': 'US',
+    'ToCity': 'NEW+YORK',
+    'FromCity': 'SAN+FRANCISCO',
+    'CalledState': 'NY',
+    'FromZip': '94571',
+    'AnsweredBy': 'human',
+    'FromState': 'CA'
+}
+
 _BAD_CALLBACK = ('/call-status/3/?Called=+15005550006',
     'ToState=NY&CallerCountry=US&Direction=outbound-api&Timeout')
 
@@ -72,8 +100,12 @@ def _construct_callback_url(id_num, answered_by, duration):
     _CALLBACK_STATUS_DICT['AnsweredBy'] = answered_by
     _CALLBACK_STATUS_DICT['CallDuration'] = duration
     base_url = '/call-status/{}/?'.format(id_num)
-    callback_status_url = '{}{}'.format(base_url, urlencode(_CALLBACK_STATUS_DICT))
-    return callback_status_url
+    return '{}{}'.format(base_url, urlencode(_CALLBACK_STATUS_DICT))
+
+
+def _construct_outbound_url(number):
+    base_url = '/outbound/{}/?'.format(number)
+    return '{}{}'.format(base_url, urlencode(_OUTBOUND_DICT))
 
 
 def _create_call_req(id_num):
@@ -228,8 +260,7 @@ class ViewTests(TestCase):
         # Then the form is invalid
         self.assertFalse(form.is_valid())
 
-    @patch.object(view_helpers.Client, 'calls', autospec=True)
-    def test_valid_form_can_post_and_create_scheduled_call_request(self, mock_calls):
+    def test_valid_form_can_post_and_create_scheduled_call_request(self):
         # Given: valid PhoneNumber and datetime objects
         source_num = ModelPhoneNumber.from_string('+15105005000')
         target_num = ModelPhoneNumber.from_string('+14155005000')
@@ -256,8 +287,27 @@ class ViewTests(TestCase):
         # No calls would have been created
         self.assertEqual(len(Call.objects.all()), 0)
 
-    @patch.object(view_helpers.Client, 'calls', autospec=True)
-    def test_valid_form_can_post_and_create_call_now_request(self, mock_calls):
+    def test_valid_form_cannot_post_and_create_duplicate_call_request(self):
+        # Given: valid PhoneNumber and datetime objects
+        source_num = ModelPhoneNumber.from_string('+15105005000')
+        target_num = ModelPhoneNumber.from_string('+14155005000')
+        time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
+
+        page_data = {
+            'source_num': source_num,
+            'target_num': target_num,
+            'time_scheduled': time_scheduled,
+            'schedule': 'Schedule Call'
+        }
+
+        # When the form is posted to schedule path
+        request1 = self.client.post('/', data=page_data)
+
+        request2 = self.client.post('/', data=page_data)
+        self.assertEqual(request1.status_code, 200)
+        self.assertEqual(request2.status_code, 302)
+
+    def test_valid_form_can_post_and_create_call_now_request(self):
         # Given: valid PhoneNumber and datetime objects
         source_num = ModelPhoneNumber.from_string('+15105005000')
         target_num = ModelPhoneNumber.from_string('+14155005000')
@@ -311,7 +361,34 @@ class ViewTests(TestCase):
         # And there will be no resulting call_request object
         self.assertEqual(len(call_req), 0)
 
-    def test_human_answer_updates_successful_call_obj(self):
+    @patch.object(views.twiml.Response, 'dial', autospec=True)
+    def test_outbound_success_route(self, mock_dial):
+        # Given: An request to outbound view
+        target_num = '+15105005000'
+        outbound_request = _construct_outbound_url(target_num)
+        request = self.factory.get(outbound_request)
+        # When: A response is given
+        response = views.outbound(request, target_num)
+
+        # Then: Expect it to return 200 status code and to call dial once
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mock_dial.call_count, 1)
+
+    @patch.object(views.twiml.Response, 'dial', autospec=True)
+    def test_outbound_failure_route(self, mock_dial):
+        # Given: A request to outbound view that will throw an Exception
+        mock_dial.side_effect = Exception
+        target_num = '+15005550001'
+        outbound_request = _construct_outbound_url(target_num)
+        request = self.factory.get(outbound_request)
+        # When: The response is given
+        response = views.outbound(request, target_num)
+
+        # Then: Expect to redirect to index when dial is called
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(mock_dial.call_count, 1)
+
+    def test_human_answer_updates_call_obj_via_call_status(self):
         # Given: No call objects
         self.assertEqual(len(Call.objects.all()), 0)
 
@@ -323,13 +400,13 @@ class ViewTests(TestCase):
         # And: A request is made to call_status webhook with completed, human answer
         human_answer = _construct_callback_url(call_req.id, 'human', 42)
         request = self.factory.get(human_answer)
-        response = call_status(request, call_req.id, call.id)
+        response = views.call_status(request, call_req.id, call.id)
 
         # Then: There will be a successful Call object and a 200 status code
         self.assertEqual(Call.objects.get(id=call.id).success, True)
         self.assertEqual(response.status_code, 200)
 
-    def test_machine_answer_updates_unsuccessful_call_obj(self):
+    def test_machine_answer_updates_call_obj_via_call_status(self):
         # Given: No call objects
         self.assertEqual(len(Call.objects.all()), 0)
 
@@ -341,7 +418,7 @@ class ViewTests(TestCase):
         # And: A request is made to call_status webhook with a completed, machine answer
         machine_answer = _construct_callback_url(call_req.id, 'machine', 0)
         request = self.factory.get(machine_answer)
-        response = call_status(request, call_req.id, call.id)
+        response = views.call_status(request, call_req.id, call.id)
 
         # Then: There will be a failed Call object and a 200 status code
         self.assertEqual(Call.objects.get(id=call.id).success, False)
@@ -349,7 +426,7 @@ class ViewTests(TestCase):
         # And: Related call_request will have call_completed remaining False
         self.assertFalse(CallRequest.objects.get(id=2).call_completed)
 
-    def test_bad_callback_updates_unsuccessful_call_obj(self):
+    def test_bad_callback_updates_call_obj_via_call_status(self):
         # Given: No call objects
         self.assertEqual(len(Call.objects.all()), 0)
 
@@ -360,7 +437,7 @@ class ViewTests(TestCase):
 
         # And: A request is made to the call_status webhook without required information
         request = self.factory.get(_BAD_CALLBACK)
-        response = call_status(request, call_req.id, call.id)
+        response = views.call_status(request, call_req.id, call.id)
 
         # Then: There will be a failed Call object and a 200 status code
         self.assertEqual(Call.objects.get(id=call.id).success, False)
@@ -396,6 +473,16 @@ class ViewHelpersTests(TestCase):
         with self.assertRaises(MiddlewareNotUsed):
             view_helpers.load_twilio_config()
 
+    @patch.dict(os.environ, FAKE_ENV_VAR_DICT)
+    def test_load_twilio_client_success(self):
+        # Given: view_helpers and config tuple
+        config = view_helpers.load_twilio_config()
+
+        # When: twilio_client is loaded with configs
+        twilio_client = view_helpers.load_twilio_client(config[1], config[2])
+        # Then: twilio client is based on expected configs
+        self.assertEqual(twilio_client.auth, ('hi', 'hi'))
+
     @patch.object(view_helpers.Client, 'calls', autospec=True)
     @patch.dict(os.environ, FAKE_ENV_VAR_DICT)
     def test_make_call_places_call(self, mock_calls):
@@ -410,7 +497,7 @@ class ViewHelpersTests(TestCase):
         self.assertEqual(mock_calls.create.call_count, 1)
         # Including the correct forwarding URLs
         outbound_url = urljoin(FAKE_ENV_VAR_DICT['OUTBOUND_URL'], '+15005550006/')
-        callstatus_url = urljoin(FAKE_ENV_VAR_DICT['CALL_STATUS_URL'], '{0!s}/{1!s}'.format(
+        callstatus_url = urljoin(FAKE_ENV_VAR_DICT['CALL_STATUS_URL'], '{0!s}/{1!s}/'.format(
             call_req.id, call.id))
         mock_calls.create.assert_called_once_with(
             from_=FAKE_ENV_VAR_DICT['TWILIO_NUMBER'],
