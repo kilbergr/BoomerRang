@@ -1,14 +1,14 @@
 from django import forms
 
+from phonenumber_field.formfields import PhoneNumberField
+
 from boomerrang.boomerrang_app.models import CallRequest
 
 
-class BoomForm(forms.ModelForm):
+class BoomForm(forms.Form):
+    source_num = PhoneNumberField()
+    target_num = PhoneNumberField()
     time_scheduled = forms.DateTimeField(input_formats=['%m-%d-%Y %H:%M'])
-
-    class Meta:
-        model = CallRequest
-        fields = ('source_num', 'target_num', 'time_scheduled')
 
     def __init__(self, *args, **kwargs):
         super(BoomForm, self).__init__(*args, **kwargs)

@@ -11,8 +11,14 @@ class Org(models.Model):
     password = models.CharField(max_length=254)
 
 
+class PhoneNumber(models.Model):
+    number = PhoneNumberField()
+    validated = models.NullBooleanField()
+    blacklisted = models.BooleanField(default=False)
+
+
 class CallRequest(models.Model):
-    source_num = PhoneNumberField()
+    source_num = models.ForeignKey(PhoneNumber, related_name='source_number')
     target_num = PhoneNumberField()
     call_completed = models.NullBooleanField()
     time_scheduled = models.DateTimeField(auto_now=False)

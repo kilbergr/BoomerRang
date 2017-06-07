@@ -7,7 +7,7 @@ import django
 from django.core.management import call_command
 from django.utils import timezone
 
-from boomerrang.boomerrang_app.models import CallRequest, Org, Call
+from boomerrang.boomerrang_app.models import CallRequest, Org, Call, PhoneNumber
 from boomerrang.boomerrang_app import view_helpers
 
 
@@ -34,8 +34,9 @@ class RunSchedulatorTests(django.test.TestCase):
         # Given: A CallRequest with time_scheduled <= now
         org = Org(username='boblah', password='blah')
         org.save()
+        source_num = PhoneNumber.objects.create(number='+15555555555')
         CallRequest.objects.create(
-            source_num='+15555555555',
+            source_num=source_num,
             target_num='+15555555555',
             org=org,
             time_scheduled=timezone.now()).save()
@@ -51,9 +52,10 @@ class RunSchedulatorTests(django.test.TestCase):
         # Given: A CallRequest with time_scheduled in the future
         org = Org(username='boblah', password='blah')
         org.save()
+        source_num = PhoneNumber.objects.create(number='+15555555555')
         future_time = timezone.now() + datetime.timedelta(minutes=10)
         CallRequest.objects.create(
-            source_num='+15555555555',
+            source_num=source_num,
             target_num='+15555555555',
             org=org,
             time_scheduled=future_time).save()
@@ -69,8 +71,9 @@ class RunSchedulatorTests(django.test.TestCase):
         # Given: A CallRequest with call_completed set to True
         org = Org(username='boblah', password='blah')
         org.save()
+        source_num = PhoneNumber.objects.create(number='+15555555555')
         CallRequest.objects.create(
-            source_num='+15555555555',
+            source_num=source_num,
             target_num='+15555555555',
             org=org,
             time_scheduled=timezone.now(),
@@ -87,8 +90,9 @@ class RunSchedulatorTests(django.test.TestCase):
         # Given: A CallRequest and a successful call
         org = Org(username='boblah', password='blah')
         org.save()
+        source_num = PhoneNumber.objects.create(number='+15555555555')
         request = CallRequest.objects.create(
-            source_num='+15555555555',
+            source_num=source_num,
             target_num='+15555555555',
             org=org,
             time_scheduled=timezone.now())
@@ -110,8 +114,9 @@ class RunSchedulatorTests(django.test.TestCase):
         # Given: A CallRequest and three failed calls
         org = Org(username='boblah', password='blah')
         org.save()
+        source_num = PhoneNumber.objects.create(number='+15555555555')
         request = CallRequest.objects.create(
-            source_num='+15555555555',
+            source_num=source_num,
             target_num='+15555555555',
             org=org,
             time_scheduled=timezone.now())
@@ -134,8 +139,9 @@ class RunSchedulatorTests(django.test.TestCase):
         # Given: A CallRequest and a yet uncompleted call
         org = Org(username='boblah', password='blah')
         org.save()
+        source_num = PhoneNumber.objects.create(number='+15555555555')
         request = CallRequest.objects.create(
-            source_num='+15555555555',
+            source_num=source_num,
             target_num='+15555555555',
             org=org,
             time_scheduled=timezone.now())
