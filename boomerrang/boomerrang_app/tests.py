@@ -497,7 +497,7 @@ class ViewHelpersTests(TestCase):
         self.assertEqual(mock_calls.create.call_count, 1)
         # Including the correct forwarding URLs
         outbound_url = urljoin(FAKE_ENV_VAR_DICT['OUTBOUND_URL'], '+15005550006/')
-        callstatus_url = urljoin(FAKE_ENV_VAR_DICT['CALL_STATUS_URL'], '{0!s}/{1!s}/'.format(
+        callstatus_url = urljoin(FAKE_ENV_VAR_DICT['CALL_STATUS_URL'], '{0!s}/{1!s}'.format(
             call_req.id, call.id))
         mock_calls.create.assert_called_once_with(
             from_=FAKE_ENV_VAR_DICT['TWILIO_NUMBER'],

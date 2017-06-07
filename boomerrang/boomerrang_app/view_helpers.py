@@ -52,7 +52,7 @@ def make_call(call_request, call_id):
                                   target_num),
                                method='GET',
                                status_callback=urljoin(os.environ.get('CALL_STATUS_URL'),
-                                                       '{0!s}/{1!s}/'.format(
+                                                       '{0!s}/{1!s}'.format(
                                                             call_request.id, call_id)),
                                status_callback_method='POST',
                                if_machine='Hangup')
