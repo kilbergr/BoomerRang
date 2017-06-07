@@ -51,12 +51,14 @@ class Command(BaseCommand):
             cr1 = CallRequest.objects.create(
                     source_num=number1,
                     target_num='+15555555555',
+                    call_completed=True,
                     time_scheduled=now,
                     org=org1
                     )
             cr2 = CallRequest.objects.create(
                     source_num=number1,
                     target_num='+15555555555',
+                    call_completed=True,
                     time_scheduled=now,
                     org=org2
                     )
