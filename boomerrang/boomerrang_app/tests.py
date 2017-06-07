@@ -307,7 +307,8 @@ class ViewTests(TestCase):
         self.assertEqual(request1.status_code, 200)
         self.assertEqual(request2.status_code, 302)
 
-    def test_valid_form_can_post_and_create_call_now_request(self):
+    @patch.object(view_helpers.Client, 'calls', autospec=True)
+    def test_valid_form_can_post_and_create_call_now_request(self, mock_calls):
         # Given: valid PhoneNumber and datetime objects
         source_num = ModelPhoneNumber.from_string('+15105005000')
         target_num = ModelPhoneNumber.from_string('+14155005000')
