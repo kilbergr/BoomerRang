@@ -32,14 +32,13 @@ class RunSchedulatorTests(django.test.TestCase):
 
     def test_schedulator_creates_call_object(self):
         # Given: A CallRequest with time_scheduled <= now
-        org = Org(username='boblah', password='blah')
-        org.save()
+        org = Org.objects.create(username='boblah', password='blah')
         source_num = PhoneNumber.objects.create(number='+15555555555')
         CallRequest.objects.create(
             source_num=source_num,
             target_num='+15555555555',
             org=org,
-            time_scheduled=timezone.now()).save()
+            time_scheduled=timezone.now())
 
         # When: Schedulator 9000 is run
         call_command('run_schedulator')
@@ -50,15 +49,14 @@ class RunSchedulatorTests(django.test.TestCase):
 
     def test_schedulator_does_not_trigger_future_calls(self):
         # Given: A CallRequest with time_scheduled in the future
-        org = Org(username='boblah', password='blah')
-        org.save()
+        org = Org.objects.create(username='boblah', password='blah')
         source_num = PhoneNumber.objects.create(number='+15555555555')
         future_time = timezone.now() + datetime.timedelta(minutes=10)
         CallRequest.objects.create(
             source_num=source_num,
             target_num='+15555555555',
             org=org,
-            time_scheduled=future_time).save()
+            time_scheduled=future_time)
 
         # When: Schedulator 9000 is run
         call_command('run_schedulator')
@@ -69,15 +67,14 @@ class RunSchedulatorTests(django.test.TestCase):
 
     def test_schedulator_does_not_retry_completed_call_requests(self):
         # Given: A CallRequest with call_completed set to True
-        org = Org(username='boblah', password='blah')
-        org.save()
+        org = Org.objects.create(username='boblah', password='blah')
         source_num = PhoneNumber.objects.create(number='+15555555555')
         CallRequest.objects.create(
             source_num=source_num,
             target_num='+15555555555',
             org=org,
             time_scheduled=timezone.now(),
-            call_completed=True).save()
+            call_completed=True)
 
         # When: Schedulator 9000 is run
         call_command('run_schedulator')
@@ -88,20 +85,18 @@ class RunSchedulatorTests(django.test.TestCase):
 
     def test_schedulator_does_not_retry_successful_calls(self):
         # Given: A CallRequest and a successful call
-        org = Org(username='boblah', password='blah')
-        org.save()
+        org = Org.objects.create(username='boblah', password='blah')
         source_num = PhoneNumber.objects.create(number='+15555555555')
         request = CallRequest.objects.create(
             source_num=source_num,
             target_num='+15555555555',
             org=org,
             time_scheduled=timezone.now())
-        request.save()
         Call.objects.create(
             call_time=timezone.now(),
             success=True,
             duration=42,
-            call_request=request).save()
+            call_request=request)
 
         # When: Schedulator 9000 is run
         call_command('run_schedulator')
@@ -112,21 +107,19 @@ class RunSchedulatorTests(django.test.TestCase):
 
     def test_schedulator_does_attempt_calling_more_than_thrice(self):
         # Given: A CallRequest and three failed calls
-        org = Org(username='boblah', password='blah')
-        org.save()
+        org = Org.objects.create(username='boblah', password='blah')
         source_num = PhoneNumber.objects.create(number='+15555555555')
         request = CallRequest.objects.create(
             source_num=source_num,
             target_num='+15555555555',
             org=org,
             time_scheduled=timezone.now())
-        request.save()
         for _ in range(0, 3):
             Call.objects.create(
                 call_time=timezone.now(),
                 success=False,
                 duration=42,
-                call_request=request).save()
+                call_request=request)
 
         # When: Schedulator 9000 is run
         call_command('run_schedulator')
@@ -137,20 +130,18 @@ class RunSchedulatorTests(django.test.TestCase):
 
     def test_schedulator_does_not_retry_unfailed_calls(self):
         # Given: A CallRequest and a yet uncompleted call
-        org = Org(username='boblah', password='blah')
-        org.save()
+        org = Org.objects.create(username='boblah', password='blah')
         source_num = PhoneNumber.objects.create(number='+15555555555')
         request = CallRequest.objects.create(
             source_num=source_num,
             target_num='+15555555555',
             org=org,
             time_scheduled=timezone.now())
-        request.save()
         Call.objects.create(
             call_time=timezone.now(),
             success=None,
             duration=None,
-            call_request=request).save()
+            call_request=request)
 
         # When: Schedulator 9000 is run
         call_command('run_schedulator')

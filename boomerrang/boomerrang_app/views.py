@@ -67,14 +67,14 @@ def index(request):
                     messages.error(request, err_msg)
                     return redirect('index')
 
+                # If user schedules call in the future
                 if 'schedule' in request.POST:
-                    # If user schedules call in the future
                     messages.success(request, 'Call scheduled!')
                     log.info('Scheduled a call between {} and {}'.format(
                         new_call_request.source_num, new_call_request.target_num))
 
+                # If user calls now
                 if 'callnow' in request.POST:
-                    # If user calls now
                     new_call_request.time_scheduled = datetime.now(timezone.utc)
                     new_call_request.save()
                     view_helpers.launch_call_process(new_call_request)

@@ -1,5 +1,5 @@
 # Loads and deletes test data from the database.
-# To use: from site root, run `python manage.py load_data`
+# To use: from site root, run `python manage.py manage_data`
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
@@ -38,8 +38,6 @@ class Command(BaseCommand):
             org2 = Org.objects.create(
                     username='CorpTech',
                     password='truss')
-            org1.save()
-            org2.save()
 
             # Add PhoneNumbers
             number1 = PhoneNumber.objects.create(
@@ -64,35 +62,45 @@ class Command(BaseCommand):
                     time_scheduled=now,
                     org=org2
                     )
-            cr1.save()
-            cr2.save()
 
-            data = [org1.username, org2.username, number1, cr1, cr2]
+            # Add Calls
+            call1 = Call.objects.create(
+                call_time=now,
+                success=True,
+                duration=40,
+                call_request=cr1)
+            call2 = Call.objects.create(
+                call_time=now,
+                success=True,
+                duration=45,
+                call_request=cr2)
+
+            data = [org1.username, org2.username, number1, cr1, cr2, call1, call2]
 
             self.stdout.write("Data loaded successfully: {}".format(data))
 
         elif options['delete']:
-            call_requests = CallRequest.objects.all()
-            for cr in call_requests:
-                cr.delete()
-                self.stdout.write('{} deleted'.format(cr))
+            calls = Call.objects.all()
+            for c in calls:
+                c.delete()
+                self.stdout.write('{} deleted'.format(c))
 
             numbers = PhoneNumber.objects.all()
             for num in numbers:
                 num.delete()
                 self.stdout.write('{} deleted'.format(num))
 
+            call_requests = CallRequest.objects.all()
+            for cr in call_requests:
+                cr.delete()
+                self.stdout.write('{} deleted'.format(cr))
+
             orgs = Org.objects.all()
             for o in orgs:
                 o.delete()
                 self.stdout.write('{} deleted'.format(o))
 
-            calls = Call.objects.all()
-            for c in calls:
-                c.delete()
-                self.stdout.write('{} deleted'.format(c))
-
-            if not call_requests and not orgs and not calls and not numbers:
+            if not call_requests and not orgs and not numbers and not calls:
                 self.stdout.write("No data to delete.")
 
         else:
