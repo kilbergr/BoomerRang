@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 import dj_database_url
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -153,14 +154,31 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'simple',
+            'stream': sys.stdout
+        },
+        'SysLog': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.SysLogHandler',
+            'formatter': 'simple',
+            'address': ('logs5.papertrailapp.com', 41060)
+        },
+    },
+    'formatters': {
+        'simple': {
+            'format': '%(asctime)s BOOMERRANG: %(message)s',
+            'datefmt': '%Y-%m-%dT%H:%M:%S',
         },
     },
     'loggers': {
         'boom_logger': {
-            'handlers': ['console'],
+            'handlers': ['console', 'SysLog'],
             'level': 'DEBUG',
+        },
+        'django': {
+            'handlers': ['SysLog'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
     },
 }
-
