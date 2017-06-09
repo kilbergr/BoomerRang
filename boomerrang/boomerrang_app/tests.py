@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime, timezone
+from datetime import datetime
 import os
 from unittest.mock import patch
 from urllib.parse import urljoin, urlencode
@@ -12,7 +12,8 @@ from phonenumber_field.phonenumber import PhoneNumber as ModelPhoneNumber
 
 from boomerrang.boomerrang_app import view_helpers, views
 from boomerrang.boomerrang_app.forms import BoomForm
-from boomerrang.boomerrang_app.models import Org, CallRequest, Call, PhoneNumber
+from boomerrang.boomerrang_app.models import (Org, CallRequest, Call,
+                                              PhoneNumber)
 
 FAKE_ENV_VAR_DICT = {
     'TWILIO_ACCOUNT_SID': 'hi',
@@ -93,7 +94,7 @@ _OUTBOUND_DICT = {
 }
 
 _BAD_CALLBACK = ('/call-status/3/?Called=+15005550006',
-    'ToState=NY&CallerCountry=US&Direction=outbound-api&Timeout')
+                 'ToState=NY&CallerCountry=US&Direction=outbound-api&Timeout')
 
 
 def _construct_callback_url(id_num, answered_by, duration):
@@ -111,7 +112,7 @@ def _construct_outbound_url(number):
 def _create_call_req(id_num):
     org = Org.objects.create(username='boblah', password='blah')
     source_num = PhoneNumber.objects.create(
-         number=ModelPhoneNumber.from_string('+15105005006'))
+        number=ModelPhoneNumber.from_string('+15105005006'))
     call_req = CallRequest.objects.create(
         source_num=source_num,
         target_num='+15005550006',
@@ -186,12 +187,12 @@ class ModelTests(TestCase):
 
     def test_callrequest_must_be_unique(self):
         # Given: A valid CallRequest object
-        call_request1 = _create_call_req(1)
+        _create_call_req(1)
 
         # When: Duplication is attempted
         # Then: Raise exception because unique constraint violated
         with self.assertRaises(IntegrityError):
-            call_request2 = _create_call_req(1)
+            _create_call_req(1)
 
 
 class ViewTests(TestCase):
@@ -398,7 +399,7 @@ class ViewTests(TestCase):
         call = _create_call_obj(call_req.id, 1)
         self.assertEqual(call.success, None)
 
-        # And: A request is made to call_status webhook with completed, human answer
+        # And: Request made to call_status with completed, human answer
         human_answer = _construct_callback_url(call_req.id, 'human', 42)
         request = self.factory.get(human_answer)
         response = views.call_status(request, call_req.id, call.id)
@@ -416,7 +417,7 @@ class ViewTests(TestCase):
         call = _create_call_obj(call_req.id, 1)
         self.assertEqual(call.success, None)
 
-        # And: A request is made to call_status webhook with a completed, machine answer
+        # And: Request made to call_status with completed, machine answer
         machine_answer = _construct_callback_url(call_req.id, 'machine', 0)
         request = self.factory.get(machine_answer)
         response = views.call_status(request, call_req.id, call.id)
@@ -436,7 +437,7 @@ class ViewTests(TestCase):
         call = _create_call_obj(call_req.id, 1)
         self.assertEqual(call.success, None)
 
-        # And: A request is made to the call_status webhook without required information
+        # And: Request made to the call_status without required information
         request = self.factory.get(_BAD_CALLBACK)
         response = views.call_status(request, call_req.id, call.id)
 
@@ -497,8 +498,10 @@ class ViewHelpersTests(TestCase):
         # Then: create has been called with expected input
         self.assertEqual(mock_calls.create.call_count, 1)
         # Including the correct forwarding URLs
-        outbound_url = urljoin(FAKE_ENV_VAR_DICT['OUTBOUND_URL'], '+15005550006/')
-        callstatus_url = urljoin(FAKE_ENV_VAR_DICT['CALL_STATUS_URL'], '{0!s}/{1!s}/'.format(
+        outbound_url = urljoin(
+            FAKE_ENV_VAR_DICT['OUTBOUND_URL'], '+15005550006/')
+        callstatus_url = urljoin(FAKE_ENV_VAR_DICT['CALL_STATUS_URL'],
+                                 '{0!s}/{1!s}'.format(
             call_req.id, call.id))
         mock_calls.create.assert_called_once_with(
             from_=FAKE_ENV_VAR_DICT['TWILIO_NUMBER'],
@@ -521,12 +524,12 @@ class ViewHelpersTests(TestCase):
 
         # Then: Dictionary will be as expected
         self.assertEqual(call_status_info,
-            {'Success': True,
-            'CallDuration': '42',
-            'CallStatus': 'completed',
-            'AnsweredBy': 'human',
-            'Timestamp': call_req.time_scheduled
-            })
+                         {'Success': True,
+                          'CallDuration': '42',
+                          'CallStatus': 'completed',
+                          'AnsweredBy': 'human',
+                          'Timestamp': call_req.time_scheduled
+                          })
 
         # And: Related call_request will have call_completed set to True
         self.assertTrue(CallRequest.objects.get(id=1).call_completed)
@@ -543,12 +546,12 @@ class ViewHelpersTests(TestCase):
 
         # Then: Dictionary will be as expected
         self.assertEqual(call_status_info,
-            {'Success': False,
-            'CallDuration': 0,
-            'CallStatus': 'completed',
-            'AnsweredBy': 'machine',
-            'Timestamp': call_req.time_scheduled
-            })
+                         {'Success': False,
+                          'CallDuration': 0,
+                          'CallStatus': 'completed',
+                          'AnsweredBy': 'machine',
+                          'Timestamp': call_req.time_scheduled
+                          })
 
         # And: Related call_request will have call_completed set to True
         self.assertFalse(CallRequest.objects.get(id=2).call_completed)
