@@ -1,9 +1,9 @@
 from email.utils import parsedate_to_datetime
 import logging
-import os
 from twilio.rest import Client
 from urllib.parse import urljoin
 
+from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.utils import timezone
 
@@ -14,14 +14,15 @@ log = logging.getLogger('boom_logger')
 
 
 def load_twilio_config():
-    twilio_account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
-    twilio_auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
-    twilio_number = os.environ.get('TWILIO_NUMBER')
+    twilio_config = (
+        settings.TWILIO_ACCOUNT_SID,
+        settings.TWILIO_AUTH_TOKEN,
+        settings.TWILIO_NUMBER)
 
-    if not all([twilio_account_sid, twilio_auth_token, twilio_number]):
+    if not all(twilio_config):
         print('Twilio auth info not configured.')
         raise MiddlewareNotUsed
-    return (twilio_number, twilio_account_sid, twilio_auth_token)
+    return twilio_config
 
 
 def load_twilio_client(twilio_account_sid, twilio_auth_token):
@@ -46,18 +47,16 @@ def make_call(call_request, call_id):
                                  call_request.target_num.national_number)
 
     # Place call, url constructed from env var and target_num var
-    twilio_client.calls.create(
-        from_=twilio_number,
-        to=source_num,
-        url=urljoin(os.environ.get('OUTBOUND_URL'),
-                    target_num),
-        method='GET',
-        status_callback=urljoin(os.environ.get('CALL_STATUS_URL'),
-                                '{0!s}/{1!s}'.format(
-            call_request.id, call_id)),
-        status_callback_method='POST',
-        if_machine='Hangup'
-    )
+    twilio_client.calls.create(from_=twilio_number,
+                               to=source_num,
+                               url=urljoin(settings.OUTBOUND_URL,
+                                           target_num),
+                               method='GET',
+                               status_callback=urljoin(settings.CALL_STATUS_URL,
+                                                       '{0!s}/{1!s}/'.format(
+                                                           call_request.id, call_id)),
+                               status_callback_method='POST',
+                               if_machine='Hangup')
 
 
 def launch_call_process(call_request):
