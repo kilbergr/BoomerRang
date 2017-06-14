@@ -7,7 +7,8 @@ from django.core.management import call_command
 from django.test.utils import override_settings
 from django.utils import timezone
 
-from boomerrang.boomerrang_app.models import CallRequest, Org, Call, PhoneNumber
+from boomerrang.boomerrang_app.models import (CallRequest, Org,
+                                              Call, PhoneNumber)
 from boomerrang.boomerrang_app import view_helpers
 
 
@@ -30,7 +31,8 @@ class RunSchedulatorTests(django.test.TestCase):
     def test_schedulator_creates_call_object(self):
         # Given: A CallRequest with time_scheduled <= now
         org = Org.objects.create(username='boblah', password='blah')
-        source_num = PhoneNumber.objects.create(number='+15555555555')
+        source_num = PhoneNumber.objects.create(number='+15555555555',
+                                                validated=True)
         CallRequest.objects.create(
             source_num=source_num,
             target_num='+15555555555',
@@ -44,10 +46,48 @@ class RunSchedulatorTests(django.test.TestCase):
         # Then: A call object has been created
         self.assertEqual(len(calls), 1)
 
+    def test_schedulator_invalid_sourcenum_does_not_create_call_object(self):
+        # Given: A CallRequest with time_scheduled <= now
+        org = Org.objects.create(username='boblah', password='blah')
+        source_num = PhoneNumber.objects.create(number='+15555555555',
+                                                validated=False)
+        CallRequest.objects.create(
+            source_num=source_num,
+            target_num='+15555555555',
+            org=org,
+            time_scheduled=timezone.now())
+
+        # When: Schedulator 9000 is run
+        call_command('run_schedulator')
+
+        calls = Call.objects.all()
+        # Then: A call object has been created
+        self.assertEqual(len(calls), 0)
+
+    def test_schedulator_blacklisted_sourcenum_does_not_create_call_obj(self):
+        # Given: A CallRequest with time_scheduled <= now
+        org = Org.objects.create(username='boblah', password='blah')
+        source_num = PhoneNumber.objects.create(number='+15555555555',
+                                                validated=True,
+                                                blacklisted=True)
+        CallRequest.objects.create(
+            source_num=source_num,
+            target_num='+15555555555',
+            org=org,
+            time_scheduled=timezone.now())
+
+        # When: Schedulator 9000 is run
+        call_command('run_schedulator')
+
+        calls = Call.objects.all()
+        # Then: A call object has been created
+        self.assertEqual(len(calls), 0)
+
     def test_schedulator_does_not_trigger_future_calls(self):
         # Given: A CallRequest with time_scheduled in the future
         org = Org.objects.create(username='boblah', password='blah')
-        source_num = PhoneNumber.objects.create(number='+15555555555')
+        source_num = PhoneNumber.objects.create(number='+15555555555',
+                                                validated=True)
         future_time = timezone.now() + datetime.timedelta(minutes=10)
         CallRequest.objects.create(
             source_num=source_num,
@@ -65,7 +105,8 @@ class RunSchedulatorTests(django.test.TestCase):
     def test_schedulator_does_not_retry_completed_call_requests(self):
         # Given: A CallRequest with call_completed set to True
         org = Org.objects.create(username='boblah', password='blah')
-        source_num = PhoneNumber.objects.create(number='+15555555555')
+        source_num = PhoneNumber.objects.create(number='+15555555555',
+                                                validated=True)
         CallRequest.objects.create(
             source_num=source_num,
             target_num='+15555555555',
@@ -83,7 +124,8 @@ class RunSchedulatorTests(django.test.TestCase):
     def test_schedulator_does_not_retry_successful_calls(self):
         # Given: A CallRequest and a successful call
         org = Org.objects.create(username='boblah', password='blah')
-        source_num = PhoneNumber.objects.create(number='+15555555555')
+        source_num = PhoneNumber.objects.create(number='+15555555555',
+                                                validated=True)
         request = CallRequest.objects.create(
             source_num=source_num,
             target_num='+15555555555',
@@ -105,7 +147,8 @@ class RunSchedulatorTests(django.test.TestCase):
     def test_schedulator_does_attempt_calling_more_than_thrice(self):
         # Given: A CallRequest and three failed calls
         org = Org.objects.create(username='boblah', password='blah')
-        source_num = PhoneNumber.objects.create(number='+15555555555')
+        source_num = PhoneNumber.objects.create(number='+15555555555',
+                                                validated=True)
         request = CallRequest.objects.create(
             source_num=source_num,
             target_num='+15555555555',
@@ -128,7 +171,8 @@ class RunSchedulatorTests(django.test.TestCase):
     def test_schedulator_does_not_retry_unfailed_calls(self):
         # Given: A CallRequest and a yet uncompleted call
         org = Org.objects.create(username='boblah', password='blah')
-        source_num = PhoneNumber.objects.create(number='+15555555555')
+        source_num = PhoneNumber.objects.create(number='+15555555555',
+                                                validated=True)
         request = CallRequest.objects.create(
             source_num=source_num,
             target_num='+15555555555',
