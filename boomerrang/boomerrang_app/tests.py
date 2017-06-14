@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-import os
 from unittest.mock import patch
 from urllib.parse import urljoin, urlencode
 
 from django.core.exceptions import MiddlewareNotUsed
 from django.db.utils import IntegrityError
 from django.test import Client, RequestFactory, TestCase
+from django.test.utils import override_settings
 from django.utils import timezone
 from phonenumber_field.phonenumber import PhoneNumber as ModelPhoneNumber
 
@@ -20,7 +20,7 @@ FAKE_ENV_VAR_DICT = {
     'TWILIO_AUTH_TOKEN': 'hi',
     'TWILIO_NUMBER': 'hi',
     'CALL_STATUS_URL': 'http://www.boomerrang.com/call-status/',
-    'OUTBOUND_URL': 'http://www.boomerrang.com/outbound/'
+    'OUTBOUND_URL': 'http://www.boomerrang.com/outbound/',
 }
 
 FAKE_INCORRECT_ENV_VAR_DICT = {
@@ -309,6 +309,7 @@ class ViewTests(TestCase):
         self.assertEqual(request2.status_code, 302)
 
     @patch.object(view_helpers.Client, 'calls', autospec=True)
+    @override_settings(**FAKE_ENV_VAR_DICT)
     def test_valid_form_can_post_and_create_call_now_request(self, mock_calls):
         # Given: valid PhoneNumber and datetime objects
         source_num = ModelPhoneNumber.from_string('+15105005000')
@@ -453,7 +454,7 @@ class ViewHelpersTests(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
 
-    @patch.dict(os.environ, FAKE_ENV_VAR_DICT)
+    @override_settings(**FAKE_ENV_VAR_DICT)
     def test_load_twilio_config(self):
         # Given: View_helpers
         # When: Twilio configs are loaded
@@ -466,7 +467,7 @@ class ViewHelpersTests(TestCase):
         # Then: configs conform to expectations
         self.assertEqual(config, env_vars)
 
-    @patch.dict(os.environ, FAKE_INCORRECT_ENV_VAR_DICT)
+    @override_settings(**FAKE_INCORRECT_ENV_VAR_DICT)
     def test_load_no_twilio_config_fails(self):
         # Given: View_helpers
         # When: Twilio configs with missing env variables
@@ -475,7 +476,7 @@ class ViewHelpersTests(TestCase):
         with self.assertRaises(MiddlewareNotUsed):
             view_helpers.load_twilio_config()
 
-    @patch.dict(os.environ, FAKE_ENV_VAR_DICT)
+    @override_settings(**FAKE_ENV_VAR_DICT)
     def test_load_twilio_client_success(self):
         # Given: view_helpers and config tuple
         config = view_helpers.load_twilio_config()
@@ -486,7 +487,7 @@ class ViewHelpersTests(TestCase):
         self.assertEqual(twilio_client.auth, ('hi', 'hi'))
 
     @patch.object(view_helpers.Client, 'calls', autospec=True)
-    @patch.dict(os.environ, FAKE_ENV_VAR_DICT)
+    @override_settings(**FAKE_ENV_VAR_DICT)
     def test_make_call_places_call(self, mock_calls):
         # Given: A call_req with a valid and available twilio number
         call_req = _create_call_req(1)
@@ -500,8 +501,7 @@ class ViewHelpersTests(TestCase):
         # Including the correct forwarding URLs
         outbound_url = urljoin(
             FAKE_ENV_VAR_DICT['OUTBOUND_URL'], '+15005550006/')
-        callstatus_url = urljoin(FAKE_ENV_VAR_DICT['CALL_STATUS_URL'],
-                                 '{0!s}/{1!s}'.format(
+        callstatus_url = urljoin(FAKE_ENV_VAR_DICT['CALL_STATUS_URL'], '{0!s}/{1!s}/'.format(
             call_req.id, call.id))
         mock_calls.create.assert_called_once_with(
             from_=FAKE_ENV_VAR_DICT['TWILIO_NUMBER'],

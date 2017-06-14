@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
-import dj_database_url
 import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -28,12 +27,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'b@i+y8bkml8a&to!c=sht-y6&a#ek7n(hvkf8n@5e7qp1=se#a'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-if os.environ.get('DYNO') is not None:
-    # Using Heroku
-    debug = False
-else:
-    debug = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -96,10 +89,6 @@ DATABASES = {
     }
 }
 
-if os.environ.get('DATABASE_URL') is not None:
-    db_from_env = dj_database_url.config(conn_max_age=500)
-    DATABASES['default'].update(db_from_env)
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -133,6 +122,16 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Twilio API settings
+
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
+TWILIO_NUMBER = os.environ.get('TWILIO_NUMBER')
+
+# URL settings
+
+OUTBOUND_URL = os.environ.get('OUTBOUND_URL')
+CALL_STATUS_URL = os.environ.get('CALL_STATUS_URL')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -146,11 +145,6 @@ PHONENUMBER_DB_FORMAT = 'E164'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'formatters': {
-        'simple': {
-            'format': '%(asctime)s %(levelname)s %(message)s'
-        },
-    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',

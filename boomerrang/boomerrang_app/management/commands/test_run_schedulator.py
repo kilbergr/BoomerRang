@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import datetime
-import os
 from unittest.mock import patch
 
 import django
 from django.core.management import call_command
+from django.test.utils import override_settings
 from django.utils import timezone
 
 from boomerrang.boomerrang_app.models import CallRequest, Org, Call, PhoneNumber
@@ -18,6 +18,7 @@ FAKE_TWILIO_CONFIG_DICT = {
 }
 
 
+@override_settings(**FAKE_TWILIO_CONFIG_DICT)
 class RunSchedulatorTests(django.test.TestCase):
 
     def setUp(self):
@@ -25,10 +26,6 @@ class RunSchedulatorTests(django.test.TestCase):
             view_helpers.Client, 'calls', autospec=True)
         self.client_patch.start()
         self.addCleanup(self.client_patch.stop)
-
-        self.environ_patch = patch.dict(os.environ, FAKE_TWILIO_CONFIG_DICT)
-        self.environ_patch.start()
-        self.addCleanup(self.environ_patch.stop)
 
     def test_schedulator_creates_call_object(self):
         # Given: A CallRequest with time_scheduled <= now
