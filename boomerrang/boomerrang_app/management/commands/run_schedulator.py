@@ -30,7 +30,6 @@ class Command(BaseCommand):
         # Log if there are no call requests for the period in question
         if len(requests) == 0:
             info_msg = 'There are no calls to make for this period.'
-            log.info(info_msg)
 
         for request in requests:
             # If any calls were successful or are still in progress, skip
@@ -41,4 +40,5 @@ class Command(BaseCommand):
 
             launch_call_process(request)
             info_msg = 'A call has been made via the schedulator.'
-            log.info(info_msg)
+
+        log.info(info_msg)
