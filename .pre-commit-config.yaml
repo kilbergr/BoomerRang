@@ -20,3 +20,12 @@
     -   id: requirements-txt-fixer
         # Runs flake8 over python code
     -   id: flake8
+        # Don't accidentally import debugger
+    -   id: debug-statements
+
+-   repo: git://github.com/FalconSocial/pre-commit-python-sorter
+    sha: 1.0.4
+    hooks:
+        # Sorts the order of imports
+      - id: python-import-sorter
+        args: ['--silent-overwrite']
