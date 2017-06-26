@@ -33,7 +33,8 @@ def index(request):
             time_scheduled_obj = form.cleaned_data['time_scheduled']
 
             # Retrieve or create a phone number obj from source_num form information
-            (source_num, _) = PhoneNumber.objects.get_or_create(number=source_num_obj)
+            (source_num, _) = PhoneNumber.objects.get_or_create(
+                number=source_num_obj)
 
             # Todo (rebecca) should retrieve org object from page info or user
             # info
@@ -75,12 +76,13 @@ def index(request):
 
                 # If user calls now
                 if 'callnow' in request.POST:
-                    new_call_request.time_scheduled = datetime.now(timezone.utc)
+                    new_call_request.time_scheduled = datetime.now(
+                        timezone.utc)
                     new_call_request.save()
                     view_helpers.launch_call_process(new_call_request)
                     messages.success(request, 'Call incoming!')
                     log.info('Call occurring now between {} and {}'.format(
-                        new_call_request.source_num, new_call_request.target_num))
+                        new_call_request.source_num.number, new_call_request.target_num))
 
             else:
                 messages.error(
