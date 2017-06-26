@@ -36,7 +36,7 @@ def load_twilio_client(twilio_account_sid, twilio_auth_token):
 
 def make_call(call_request, call_id):
     # Load our Twilio credentials
-    twilio_number, twilio_account_sid, twilio_auth_token = load_twilio_config()
+    twilio_account_sid, twilio_auth_token, twilio_number = load_twilio_config()
     # Load Twilio client
     twilio_client = load_twilio_client(twilio_account_sid, twilio_auth_token)
 
