@@ -1,8 +1,12 @@
 coverage==4.4.1
 Django==1.10.5
+django-bootstrap-form==3.2.1
+django-bootstrap3==9.0.0
+django-bootstrap3-datetimepicker-2==2.4.2
 django-dotenv==1.4.1
 django-heroku-postgresify==0.4
 django-phonenumber-field==1.1.0
+django-timezone-field==2.0
 gunicorn==19.7.1
 pre-commit==0.13.2
 psycopg2==2.6.2

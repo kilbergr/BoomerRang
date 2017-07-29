@@ -1,12 +1,11 @@
 # Generates calls from uncompleted prior call_requests
 import logging
-
-from django.db.models import Count
-from django.core.management.base import BaseCommand
-from django.utils import timezone
+from datetime import datetime
 
 from boomerrang.boomerrang_app.models import CallRequest
 from boomerrang.boomerrang_app.view_helpers import launch_call_process
+from django.core.management.base import BaseCommand
+from django.db.models import Count
 
 log = logging.getLogger('boom_logger')
 
@@ -33,7 +32,7 @@ class Command(BaseCommand):
         annotation = {'calls_count': Count('calls')}
         # Filter for call_requests scheduled before now with <3 calls attempted
         # Where source_num is validated and not blacklisted
-        filters = {'time_scheduled__lt': timezone.now(),
+        filters = {'time_scheduled__lt': datetime.utcnow(),
                    'calls_count__lt': 3,
                    'source_num__validated': True,
                    'source_num__blacklisted': False}

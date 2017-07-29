@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from unittest.mock import patch
-from urllib.parse import urljoin, urlencode
+from urllib.parse import urlencode, urljoin
 
+import pytz
+from boomerrang.boomerrang_app import view_helpers, views
+from boomerrang.boomerrang_app.forms import BoomForm
+from boomerrang.boomerrang_app.models import (Call, CallRequest, Org,
+                                              PhoneNumber)
 from django.core.exceptions import MiddlewareNotUsed
 from django.db.utils import IntegrityError
 from django.test import Client, RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
 from phonenumber_field.phonenumber import PhoneNumber as ModelPhoneNumber
-
-from boomerrang.boomerrang_app import view_helpers, views
-from boomerrang.boomerrang_app.forms import BoomForm
-from boomerrang.boomerrang_app.models import (Org, CallRequest, Call,
-                                              PhoneNumber)
 
 FAKE_ENV_VAR_DICT = {
     'TWILIO_ACCOUNT_SID': 'hi',
@@ -214,12 +214,16 @@ class ViewTests(TestCase):
         # Given: PhoneNumber and date time objects
         source_num = ModelPhoneNumber.from_string('+15105005000')
         target_num = ModelPhoneNumber.from_string('+14155005000')
-        time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
+        time_scheduled = datetime.now().strftime('%Y-%m-%d %H:%M')
+        timezone = pytz.timezone('America/Los_Angeles')
+        time_scheduled_utc = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
         form_data = {
             'source_num': source_num,
             'target_num': target_num,
             'time_scheduled': time_scheduled,
+            'timezone': timezone,
+            'time_scheduled_utc': time_scheduled_utc,
         }
 
         # If that data is in a BoomForm
@@ -231,12 +235,16 @@ class ViewTests(TestCase):
         # Given: Invalid PhoneNumber and date time objects
         source_num = ModelPhoneNumber.from_string('+15105005000')
         target_num = ModelPhoneNumber.from_string('+1415500000')
-        time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
+        time_scheduled = datetime.now().strftime('%Y-%m-%d %H:%M')
+        timezone = pytz.timezone('America/Los_Angeles')
+        time_scheduled_utc = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
         form_data = {
             'source_num': source_num,
             'target_num': target_num,
             'time_scheduled': time_scheduled,
+            'timezone': timezone,
+            'time_scheduled_utc': time_scheduled_utc,
         }
 
         # If that data is in a BoomForm
@@ -249,11 +257,36 @@ class ViewTests(TestCase):
         source_num = ModelPhoneNumber.from_string('+15105005000')
         target_num = ModelPhoneNumber.from_string('+14155100000')
         time_scheduled = datetime.now().strftime('%Y-%m-%d')
+        timezone = pytz.timezone('America/Los_Angeles')
+        time_scheduled_utc = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
         form_data = {
             'source_num': source_num,
             'target_num': target_num,
             'time_scheduled': time_scheduled,
+            'timezone': timezone,
+            'time_scheduled_utc': time_scheduled_utc,
+        }
+
+        # If that data is in a BoomForm
+        form = BoomForm(data=form_data)
+        # Then the form is invalid
+        self.assertFalse(form.is_valid())
+
+    def test_invalid_datetime_utc_yields_invalid_form(self):
+        # Given: PhoneNumber and invalid format for utc time object
+        source_num = ModelPhoneNumber.from_string('+15105005000')
+        target_num = ModelPhoneNumber.from_string('+14155100000')
+        time_scheduled = datetime.now().strftime('%Y-%m-%d %H:%M')
+        timezone = pytz.timezone('America/Los_Angeles')
+        time_scheduled_utc = datetime.now().strftime('%Y-%m-%d %H:%M')
+
+        form_data = {
+            'source_num': source_num,
+            'target_num': target_num,
+            'time_scheduled': time_scheduled,
+            'timezone': timezone,
+            'time_scheduled_utc': time_scheduled_utc,
         }
 
         # If that data is in a BoomForm
@@ -265,12 +298,16 @@ class ViewTests(TestCase):
         # Given: valid PhoneNumber and datetime objects
         source_num = ModelPhoneNumber.from_string('+15105005000')
         target_num = ModelPhoneNumber.from_string('+14155005000')
-        time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
+        time_scheduled = datetime.now().strftime('%Y-%m-%d %H:%M')
+        timezone = pytz.timezone('America/Los_Angeles')
+        time_scheduled_utc = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
         page_data = {
             'source_num': source_num,
             'target_num': target_num,
             'time_scheduled': time_scheduled,
+            'timezone': timezone,
+            'time_scheduled_utc': time_scheduled_utc,
             'schedule': 'Schedule Call'
         }
 
@@ -292,12 +329,16 @@ class ViewTests(TestCase):
         # Given: valid PhoneNumber and datetime objects
         source_num = ModelPhoneNumber.from_string('+15105005000')
         target_num = ModelPhoneNumber.from_string('+14155005000')
-        time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
+        time_scheduled = datetime.now().strftime('%Y-%m-%d %H:%M')
+        timezone = pytz.timezone('America/Los_Angeles')
+        time_scheduled_utc = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
         page_data = {
             'source_num': source_num,
             'target_num': target_num,
             'time_scheduled': time_scheduled,
+            'timezone': timezone,
+            'time_scheduled_utc': time_scheduled_utc,
             'schedule': 'Schedule Call'
         }
 
@@ -314,12 +355,16 @@ class ViewTests(TestCase):
         # Given: valid PhoneNumber and datetime objects
         source_num = ModelPhoneNumber.from_string('+15105005000')
         target_num = ModelPhoneNumber.from_string('+14155005000')
-        time_scheduled = datetime.now().strftime('%m-%d-%Y %H:%M')
+        time_scheduled = datetime.now().strftime('%Y-%m-%d %H:%M')
+        timezone = pytz.timezone('America/Los_Angeles')
+        time_scheduled_utc = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
         page_data = {
             'source_num': source_num,
             'target_num': target_num,
             'time_scheduled': time_scheduled,
+            'timezone': timezone,
+            'time_scheduled_utc': time_scheduled_utc,
             'callnow': 'Call Now'
         }
 
@@ -343,11 +388,15 @@ class ViewTests(TestCase):
         source_num = ModelPhoneNumber.from_string('+15105005000')
         target_num = ModelPhoneNumber.from_string('+14155005000')
         time_scheduled = datetime.now()
+        timezone = pytz.timezone('America/Los_Angeles')
+        time_scheduled_utc = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
         page_data = {
             'source_num': source_num,
             'target_num': target_num,
             'time_scheduled': time_scheduled,
+            'timezone': timezone,
+            'time_scheduled_utc': time_scheduled_utc,
             'schedule': 'Schedule Call'
         }
 
