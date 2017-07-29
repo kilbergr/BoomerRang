@@ -5,6 +5,7 @@
     -   id: trailing-whitespace
         # Ensures files end in newline character
     -   id: end-of-file-fixer
+        exclude: boomerrang/static/
         # Auto-formats python code
     -   id: autopep8-wrapper
         # Prevent large (>500kb default) files from being committed
