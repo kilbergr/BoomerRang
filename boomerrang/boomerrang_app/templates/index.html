@@ -35,6 +35,9 @@
         <!-- C2C contact form-->
         <div class="row">
             <div class="col-md-12">
+                {% for message in messages %}
+                  <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
                 <form id="contactForm" class="form-horizontal" role="form" action="/" method="post">
                   {% csrf_token %}
                   <div class="form-group">

@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 import sys
 
+from django.contrib import messages
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -148,6 +150,11 @@ STATICFILES_FINDERS = (
 
 # Set format to what twilio uses
 PHONENUMBER_DB_FORMAT = 'E164'
+
+# Overwrites message tags to work with bootstrap
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger'
+}
 
 # Set up logging
 LOGGING = {

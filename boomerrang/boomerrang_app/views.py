@@ -65,7 +65,7 @@ def index(request):
                 except IntegrityError as e:
                     err_msg = 'This is a duplicate call request and will not be completed, {}.'
                     log.error(err_msg.format(e))
-                    messages.error(request, err_msg)
+                    messages.error(request, err_msg.format(e))
                     return redirect('index')
 
                 # If user schedules call in the future
