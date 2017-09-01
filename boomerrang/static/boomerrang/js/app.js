@@ -12,7 +12,7 @@ $(function() {
     $('form#contactForm').submit(function() {
         var timeZone = $('#id_timezone').val();
         var timeStamp = $('#id_time_scheduled').val();
-        var tzAwareTime = moment(timeStamp).tz(timeZone);
+        var tzAwareTime = moment.tz(timeStamp, timeZone);
         // toISOString always converts time to 0-offset (UTC)
         $('#id_time_scheduled_utc').val(tzAwareTime.toISOString());
 
