@@ -1,13 +1,12 @@
-from email.utils import parsedate_to_datetime
 import logging
-from twilio.rest import Client
+from datetime import datetime
+from email.utils import parsedate_to_datetime
 from urllib.parse import urljoin
 
+from boomerrang.boomerrang_app.models import Call
 from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
-from django.utils import timezone
-
-from boomerrang.boomerrang_app.models import Call
+from twilio.rest import Client
 
 # Setup logging
 log = logging.getLogger('boom_logger')
@@ -61,7 +60,7 @@ def make_call(call_request, call_id):
 
 def launch_call_process(call_request):
     call = Call.objects.create(
-        call_time=timezone.now(),
+        call_time=datetime.utcnow(),
         call_request=call_request,
         success=None)
     make_call(call_request, call.id)

@@ -32,8 +32,7 @@ BoomerRang is an API that advocacy organizations can use to connect citizens wit
 2. In psql shell, create role that corresponds to app:
 
 	* `CREATE ROLE admin WITH LOGIN PASSWORD 'trussadmin';`
-	* You will likely also want to create a superuser role--currently have one 'truss':
-	 `python manage.py createsuperuser`
+	* `ALTER USER admin CREATEDB`
 
 ## Setting Your Environment Variables
 
@@ -69,4 +68,3 @@ You must do this BEFORE running the server.
 
 1. To run tests, simply run `python manage.py test` from your BoomerRang env
 2. To determine test coverage, run `coverage run --source boomerrang manage.py test` from your BoomerRang env. Then run either `coverage report` to see coverage in your terminal. If you'd like to see which lines are covered or view coverage in your browser, run `coverage html` then `open htmlcov/index.html`. From there you can click around to the different files to see where test coverage is lacking.
-

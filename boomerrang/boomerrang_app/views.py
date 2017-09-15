@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta, datetime, timezone
+import logging
+from datetime import datetime, timedelta
+
+from boomerrang.boomerrang_app import view_helpers
+from boomerrang.boomerrang_app.forms import BoomForm
+from boomerrang.boomerrang_app.models import (Call, CallRequest, Org,
+                                              PhoneNumber)
 from django.contrib import messages
 from django.db.utils import IntegrityError
 from django.http import HttpResponse
-from django.shortcuts import redirect
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
-import logging
-
 from twilio import twiml
-
-from boomerrang.boomerrang_app.forms import BoomForm
-from boomerrang.boomerrang_app.models import CallRequest, Org, Call, PhoneNumber
-from boomerrang.boomerrang_app import view_helpers
 
 # Setup logging
 log = logging.getLogger('boom_logger')
@@ -30,9 +29,10 @@ def index(request):
             # Clean objects
             source_num_obj = form.cleaned_data['source_num']
             target_num_obj = form.cleaned_data['target_num']
-            time_scheduled_obj = form.cleaned_data['time_scheduled']
+            time_scheduled_utc_obj = form.cleaned_data['time_scheduled_utc']
 
-            # Retrieve or create a phone number obj from source_num form information
+            # Retrieve or create a phone number obj from source_num form
+            # information
             (source_num, _) = PhoneNumber.objects.get_or_create(
                 number=source_num_obj)
 
@@ -40,8 +40,8 @@ def index(request):
             # info
             fake_org = Org.objects.get_or_create(
                 username='mpi', password='truss')[0]
-            past_cutoff = time_scheduled_obj - timedelta(hours=12)
-            future_cutoff = time_scheduled_obj + timedelta(hours=12)
+            past_cutoff = time_scheduled_utc_obj - timedelta(hours=12)
+            future_cutoff = time_scheduled_utc_obj + timedelta(hours=12)
             existing_requests = CallRequest.objects.filter(
                 source_num=source_num,
                 target_num=target_num_obj,
@@ -60,24 +60,23 @@ def index(request):
                         source_num=source_num,
                         target_num=target_num_obj,
                         org=fake_org,
-                        time_scheduled=time_scheduled_obj,
+                        time_scheduled=time_scheduled_utc_obj,
                         call_completed=False,)
                 except IntegrityError as e:
                     err_msg = 'This is a duplicate call request and will not be completed, {}.'
                     log.error(err_msg.format(e))
-                    messages.error(request, err_msg)
+                    messages.error(request, err_msg.format(e))
                     return redirect('index')
 
                 # If user schedules call in the future
                 if 'schedule' in request.POST:
                     messages.success(request, 'Call scheduled!')
                     log.info('Scheduled a call between {} and {}'.format(
-                        new_call_request.source_num, new_call_request.target_num))
+                        new_call_request.source_num.number, new_call_request.target_num))
 
                 # If user calls now
                 if 'callnow' in request.POST:
-                    new_call_request.time_scheduled = datetime.now(
-                        timezone.utc)
+                    new_call_request.time_scheduled = datetime.utcnow()
                     new_call_request.save()
                     view_helpers.launch_call_process(new_call_request)
                     messages.success(request, 'Call incoming!')

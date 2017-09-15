@@ -13,9 +13,10 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 import sys
 
+from django.contrib import messages
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PROJECT_ROOT = os.path.join(BASE_DIR, 'boomerrang')
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -42,6 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'phonenumber_field',
+    'timezone_field',
+    'bootstrapform',
+    'bootstrap3_datetime',
 ]
 
 MIDDLEWARE = [
@@ -135,11 +139,22 @@ CALL_STATUS_URL = os.environ.get('CALL_STATUS_URL')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 STATIC_URL = '/static/'
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+)
 
 # Set format to what twilio uses
 PHONENUMBER_DB_FORMAT = 'E164'
+
+# Overwrites message tags to work with bootstrap
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger'
+}
 
 # Set up logging
 LOGGING = {
