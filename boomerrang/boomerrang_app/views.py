@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 from boomerrang.boomerrang_app import view_helpers
 from boomerrang.boomerrang_app.forms import BoomForm
@@ -72,12 +72,11 @@ def index(request):
                 if 'schedule' in request.POST:
                     messages.success(request, 'Call scheduled!')
                     log.info('Scheduled a call between {} and {}'.format(
-                        new_call_request.source_num, new_call_request.target_num))
+                        new_call_request.source_num.number, new_call_request.target_num))
 
                 # If user calls now
                 if 'callnow' in request.POST:
-                    new_call_request.time_scheduled = datetime.now(
-                        timezone.utc)
+                    new_call_request.time_scheduled = datetime.utcnow()
                     new_call_request.save()
                     view_helpers.launch_call_process(new_call_request)
                     messages.success(request, 'Call incoming!')

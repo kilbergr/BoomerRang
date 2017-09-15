@@ -32,9 +32,9 @@ class Command(BaseCommand):
         annotation = {'calls_count': Count('calls')}
         # Filter for call_requests scheduled before now with <3 calls attempted
         # Where source_num is validated and not blacklisted
+        # TODO: re-include 'source_num__validated': True,
         filters = {'time_scheduled__lt': datetime.utcnow(),
                    'calls_count__lt': 3,
-                   'source_num__validated': True,
                    'source_num__blacklisted': False}
         # Exclude call_requests that have call_completed=True
         exclusions = {'call_completed': True}
@@ -43,6 +43,7 @@ class Command(BaseCommand):
             **annotation).filter(**filters).exclude(**exclusions)
 
         has_made_call = False
+
         for request in requests:
             # TODO: @andie - change 'success' attribute on call object to 'status'
             # in order have more useful values. Success should only be True/False.
@@ -51,8 +52,7 @@ class Command(BaseCommand):
 
             # If any related calls were successful or are still in progress, skip
             unfailed_calls = [(call.success or call.success is None)
-                             for call in request.calls.all()]
-
+                              for call in request.calls.all()]
 
             if any(unfailed_calls):
                 continue

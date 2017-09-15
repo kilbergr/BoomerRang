@@ -3,14 +3,12 @@ import datetime
 from unittest.mock import patch
 
 import django
+from boomerrang.boomerrang_app import view_helpers
+from boomerrang.boomerrang_app.models import (Call, CallRequest, Org,
+                                              PhoneNumber)
 from django.core.management import call_command
 from django.test.utils import override_settings
 from django.utils import timezone
-
-from boomerrang.boomerrang_app.models import (CallRequest, Org,
-                                              Call, PhoneNumber)
-from boomerrang.boomerrang_app import view_helpers
-
 
 FAKE_TWILIO_CONFIG_DICT = {
     'TWILIO_ACCOUNT_SID': 'hi',
@@ -46,23 +44,24 @@ class RunSchedulatorTests(django.test.TestCase):
         # Then: A call object has been created
         self.assertEqual(len(calls), 1)
 
-    def test_schedulator_invalid_sourcenum_does_not_create_call_object(self):
-        # Given: A CallRequest with time_scheduled <= now
-        org = Org.objects.create(username='boblah', password='blah')
-        source_num = PhoneNumber.objects.create(number='+15555555555',
-                                                validated=False)
-        CallRequest.objects.create(
-            source_num=source_num,
-            target_num='+15555555555',
-            org=org,
-            time_scheduled=timezone.now())
+    # TODO: Add back in once validator is included
+    # def test_schedulator_invalid_sourcenum_does_not_create_call_object(self):
+    #     # Given: A CallRequest with time_scheduled <= now
+    #     org = Org.objects.create(username='boblah', password='blah')
+    #     source_num = PhoneNumber.objects.create(number='+15555555555',
+    #                                             validated=False)
+    #     CallRequest.objects.create(
+    #         source_num=source_num,
+    #         target_num='+15555555555',
+    #         org=org,
+    #         time_scheduled=timezone.now())
 
-        # When: Schedulator 9000 is run
-        call_command('run_schedulator')
+    #     # When: Schedulator 9000 is run
+    #     call_command('run_schedulator')
 
-        calls = Call.objects.all()
-        # Then: A call object has been created
-        self.assertEqual(len(calls), 0)
+    #     calls = Call.objects.all()
+    #     # Then: A call object has been created
+    #     self.assertEqual(len(calls), 0)
 
     def test_schedulator_blacklisted_sourcenum_does_not_create_call_obj(self):
         # Given: A CallRequest with time_scheduled <= now
