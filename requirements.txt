@@ -12,3 +12,4 @@ pre-commit==0.13.2
 psycopg2==2.6.2
 six==1.10.0
 twilio==6.0rc10
+whitenoise==3.3.0
