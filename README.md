@@ -8,8 +8,8 @@ BoomerRang is an API that advocacy organizations can use to connect citizens wit
 
  1. [pyenv](https://github.com/yyuu/pyenv#homebrew-on-mac-os-x)
  2. [pyenv virtualenv](https://github.com/yyuu/pyenv-virtualenv#installing-with-homebrew-for-os-x-users)
- 3. [postgres](https://www.postgresql.org/download/macosx/): `brew install postgresq`
- 4. [ngrok](https://ngrok.com/): To install version 2 of ngrok, do NOT use homebrew. Instead, follow instructions from their site. We are using version 2.1.18. Make sure to move the application from wherever you unzip it into `/usr/local/bin/ngrok`.
+ 3. [postgres](https://www.postgresql.org/download/macosx/): `brew install postgres`
+ 4. [ngrok](https://ngrok.com/): To install version 2 of ngrok, do NOT use homebrew. Instead, follow instructions from their site. We are using version [2.1.18](https://dl.equinox.io/ngrok/ngrok/stable/archive). Make sure to move the application from wherever you unzip it into `/usr/local/bin/ngrok`.
 
 ## Virtualenv and Repo Setup:
 
@@ -54,7 +54,7 @@ The app requires environment variables to be set with your Twilio account keys a
 	* Note: to have postgres automatically run at login, run `ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents`.
 2. To run ngrok on port 4567, run `ngrok http 4567` in a terminal tab.
     * Note: ngrok must be running on the same port as django.
-3. In the terminal window where you've run ngrok, you'll see a session status with information. Find the forwarding url (will look like `Forwarding http://4af77496.ngrok.io -> localhost:4567`). Take that url and save it in your .env file in the outbound and call status urls (with the appropriate path). This will end up looking something like:  
+3. In the terminal window where you've run ngrok, you'll see a session status with information. Find the forwarding url (will look like `Forwarding http://4af77496.ngrok.io -> localhost:4567`). Take that url and save it in your .env file in the outbound and call status urls (with the appropriate path). This will end up looking something like:
 `OUTBOUND_URL='http://4af77496.ngrok.io/outbound/'
 CALL_STATUS_URL='http://4af77496.ngrok.io/call-status/'`.
 You must do this BEFORE running the server.
