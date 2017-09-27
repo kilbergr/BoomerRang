@@ -11,7 +11,6 @@ from django.db.utils import IntegrityError
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
-# from phonenumber_field.phonenumber import PhoneNumber
 from twilio import twiml
 
 # Setup logging
@@ -28,7 +27,6 @@ def index(request):
 
     if request.method == 'POST':
         # If form valid, clean data and place call
-        # TODO (Rebecca): Remove/Change once first wave Kamala Harris campaign is over
         if form.is_valid():
             # Clean objects
             source_num_obj = form.cleaned_data['source_num']
