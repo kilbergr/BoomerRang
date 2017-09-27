@@ -41,10 +41,9 @@
                 <form id="contactForm" class="form-horizontal" role="form" action="/" method="post">
                   {% csrf_token %}
                   <div class="form-group">
-                    <h3>Call Kamala Harris to talk about gun control in the U.S.</h3>
-                    <p class="help-block">
-                        Enter your phone number below to call Senator Harris.
-                    </p>
+                    <h3>Call Senator Kamala Harris to talk about gun control in the U.S.</h3>
+                    <p class="help-block">Senator Harris has spoken repeatedly about the need for tighter gun control in the United States. Please call to voice your support for her position and specifically to voice support and dissent for upcoming gun control legislation.
+                    Enter your phone number below to call Senator Harris' San Francisco office.</p>
                   </div>
                   {{ form|bootstrap_horizontal }}
                   <div class="form-group">
@@ -52,11 +51,11 @@
                     <input type="submit" name="callnow" class="btn btn-default" value="Call Now"/>
                   </div>
                 </form>
-                <p>Senator Harris has spoken repeatedly about the need for tighter gun control in the United States. Please call to voice your support for her position.</p>
                 <h3>Here's a suggested script:</h3>
                 <p>Hello. My name is ______________, and I live in ______________, California. I'm calling today to discuss the matter of gun control.</p>
                 <p>I know that Senator Harris has spoken repeatedly about the need for tighter gun control in the United States.</p>
-                <p>I wanted to call today to express my support for her position, and to ask her to continue working towards greater regulation of
+                <p>I wanted to call today to express my support for her position, and to ask her to support <a href="https://www.congress.gov/bill/115th-congress/senate-bill/1324" target="_blank">Senate Bill 1324 (the Disarm Hate Act)</a>, and <a href="https://www.congress.gov/bill/115th-congress/senate-bill/1185" target="_blank">Senate Bill 1185 (Stop Illegal Trafficking in Firearms Act of 2017)</a>. I'd also like to ask her to oppose <a href="https://www.congress.gov/bill/115th-congress/senate-bill/446" target="_blank">Senate Bill 446 (the Constitutional Concealed Carry Reciprocity Act of 2017)</a>.
+                <p>Thank you for speaking with me today.</p>
             </div>
         </div>
     </div>

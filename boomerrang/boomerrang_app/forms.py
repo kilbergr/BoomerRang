@@ -24,6 +24,9 @@ class BoomForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(BoomForm, self).__init__(*args, **kwargs)
         self.fields['source_num'].label = "Your number"
-        self.fields['target_num'].label = "Call number"
+        self.fields['source_num'].widget.attrs['placeholder'] = "e.g. +15555555555"
+        self.fields['target_num'].label = "Call number (Pre-programmed)"
+        # TODO (rebecca): Remove below to allow editing once out of user research
+        self.fields['target_num'].widget.attrs['readonly'] = "readonly"
         self.fields[
             'time_scheduled'].label = "When would you like to receive call? "
