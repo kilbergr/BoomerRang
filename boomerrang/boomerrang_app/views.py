@@ -21,7 +21,9 @@ _NUM_ALLOWED_CALLS = 10
 
 def index(request):
     # Instantiate form
-    form = BoomForm(request.POST or None)
+    # TODO (rebecca): remove initial target_num
+    form = BoomForm(request.POST or None, initial={
+                    'target_num': '+14153559041'})
 
     if request.method == 'POST':
         # If form valid, clean data and place call
