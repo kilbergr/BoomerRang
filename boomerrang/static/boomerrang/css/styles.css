@@ -1,4 +1,17 @@
-div.container{
+body {
+	padding-bottom: 140px;
+}
+
+div.container {
     width: 50vw;
     min-width: 700px;
+}
+
+.pull-right {
+  float: right !important;
+}
+
+div#footer {
+	color: #5A5A5A;
+	font-size: 80%;
 }
