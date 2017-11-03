@@ -15,6 +15,7 @@ database:
     - echo "GRANT CREATE, CONNECT ON DATABASE boomerang_db TO admin;" | psql -U postgres
 test:
   override:
+    - pre-commit run --all-files
     - python manage.py test
 deployment:
   staging:
