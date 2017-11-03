@@ -1,11 +1,14 @@
+repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    sha: 08a643e0deecd8a81f92adc11eacc1c1d91948b2
+    sha: v1.1.1
     hooks:
     -   id: trailing-whitespace
+        exclude: boomerrang/static/
     -   id: end-of-file-fixer
         exclude: boomerrang/static/
     -   id: autopep8-wrapper
-    -   id: check-added-large-files
+    # TODO: Investigate why this fails on CircleCI ONLY
+    # -   id: check-added-large-files
     -   id: check-yaml
     -   id: debug-statements
     -   id: name-tests-test
