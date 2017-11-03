@@ -31,13 +31,26 @@
   </head>
   <body>
     <?php include_once("../../settings/analyticstracking.php") ?>
+
+    <nav class="navbar navbar-default" id="header">
+      <div class="container" >
+        <div class="card">
+          <div class="card-body">
+            <h2 class="card-title">Boomerrang</h2>
+            <p class="card-text">Call to Action on Your Terms<br>
+        </div>
+      </div>
+    </nav>
+
     <div class="container">
       <!-- C2C contact form-->
       <div class="row">
         <div class="col-md-12">
+
           {% for message in messages %}
             <div class="alert alert-{{ message.tags }}">{{ message }}</div>
           {% endfor %}
+
           <form id="contactForm" class="form-horizontal" role="form" action="/" method="post">
             {% csrf_token %}
             <div class="form-group">
@@ -62,7 +75,8 @@
         </div>
       </div>
     </div>
-    <nav class="navbar navbar-default navbar-fixed-bottom">
+
+    <nav class="navbar navbar-default">
       <div class="container" id="footer">
         <div class="card">
           <div class="card-body">
@@ -75,5 +89,6 @@
         </div>
       </div>
     </nav>
+
   </body>
 </html>
