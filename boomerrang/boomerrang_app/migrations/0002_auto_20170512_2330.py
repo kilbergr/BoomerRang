@@ -18,7 +18,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='callrequest',
-            unique_together=set([('source_num', 'target_num', 'time_scheduled', 'call_completed', 'org')]),
+            unique_together=set(
+                [('source_num', 'target_num', 'time_scheduled', 'call_completed', 'org')]),
         ),
         migrations.AddField(
             model_name='call',

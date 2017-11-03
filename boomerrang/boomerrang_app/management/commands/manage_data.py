@@ -1,11 +1,10 @@
 # Loads and deletes test data from the database.
 # To use: from site root, run `python manage.py manage_data`
-from django.core.management.base import BaseCommand, CommandError
+from boomerrang.boomerrang_app.models import (Call, CallRequest, Org,
+                                              PhoneNumber)
+from django.core.management.base import BaseCommand
 from django.utils import timezone
-
 from phonenumber_field.phonenumber import PhoneNumber as ModelPhoneNumber
-
-from boomerrang.boomerrang_app.models import CallRequest, Org, Call, PhoneNumber
 
 
 class Command(BaseCommand):
@@ -33,35 +32,35 @@ class Command(BaseCommand):
         if options['load_db']:
             # Add orgs
             org1 = Org.objects.create(
-                    username='OrgCorp',
-                    password='truss')
+                username='OrgCorp',
+                password='truss')
             org2 = Org.objects.create(
-                    username='CorpTech',
-                    password='truss')
+                username='CorpTech',
+                password='truss')
 
             # Add PhoneNumbers
             number1 = PhoneNumber.objects.create(
-                        number=ModelPhoneNumber.from_string(
-                            '+15555555555'),
-                        validated=None,
-                        blacklisted=False)
+                number=ModelPhoneNumber.from_string(
+                    '+15555555555'),
+                validated=None,
+                blacklisted=False)
 
             # Add CallRequests
             now = timezone.now()
             cr1 = CallRequest.objects.create(
-                    source_num=number1,
-                    target_num='+15555555555',
-                    call_completed=True,
-                    time_scheduled=now,
-                    org=org1
-                    )
+                source_num=number1,
+                target_num='+15555555555',
+                call_completed=True,
+                time_scheduled=now,
+                org=org1
+            )
             cr2 = CallRequest.objects.create(
-                    source_num=number1,
-                    target_num='+15555555555',
-                    call_completed=True,
-                    time_scheduled=now,
-                    org=org2
-                    )
+                source_num=number1,
+                target_num='+15555555555',
+                call_completed=True,
+                time_scheduled=now,
+                org=org2
+            )
 
             # Add Calls
             call1 = Call.objects.create(
@@ -75,7 +74,8 @@ class Command(BaseCommand):
                 duration=45,
                 call_request=cr2)
 
-            data = [org1.username, org2.username, number1, cr1, cr2, call1, call2]
+            data = [org1.username, org2.username,
+                    number1, cr1, cr2, call1, call2]
 
             self.stdout.write("Data loaded successfully: {}".format(data))
 
