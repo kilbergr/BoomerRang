@@ -99,7 +99,7 @@ def outbound(request, target_num):
     try:
         response = twiml.Response()
         response.say("Hello, you'll be connected momentarily to your "
-                     "representative, Senator Feinstein, via Boomerrang.",
+                     "representative, Senator Harris, via Boomerrang.",
                      voice='alice', language='en-EN')
         log.info('Automated message delivered to source number.')
 
