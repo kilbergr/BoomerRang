@@ -1,17 +1,67 @@
+/* Header */
+
+#header {
+  padding: 1.6em 0;
+}
+
+/* Footer */
+
+#footer {
+  background-color: #F1B256;
+  color: white;
+  font-size: 80%;
+  margin-bottom: 0px;
+}
+
+/* Text */
+
+h1 {
+  font-size: 3em;
+}
+
+/* Containers */
+
 div.container {
     width: 50vw;
     min-width: 700px;
 }
 
+.container--text {
+  padding: 1em 0;
+}
+
+/* Overrides */
+
+.card-body {
+  background-color: #EEEEEE;
+  padding: .6em;
+}
+
+.card-header {
+  background-color: #F1B256;
+  color: white;
+  padding: .6em;
+}
+
+#contactForm {
+  margin: 2em 0;
+}
+
+.form-group > label.control-label {
+  text-align: left;
+}
+
+input[type="submit"] {
+  background-color: #F1B256;
+  color: white;
+}
+
+/* Utility */
+
+.color--accent {
+  color: #F1B256;
+}
+
 .pull-right {
   float: right !important;
-}
-
-div#footer {
-	color: #5A5A5A;
-	font-size: 80%;
-}
-
-#header {
-	color: #5A5A5A;
 }

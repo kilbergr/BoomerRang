@@ -5,10 +5,10 @@
   <head>
       <title>Click to Call for BoomerRang</title>
       <!-- We use Twitter Bootstrap as the default styling for our page-->
-      <link rel="stylesheet" href="{% static "boomerrang/css/styles.css" %}">
       <link rel="stylesheet" href="{% static "boomerrang/bootstrap/bootstrap.min.css" %}">
       <link rel="stylesheet" href="{% static "boomerrang/bootstrap/bootstrap-theme.min.css" %}">
       <link rel="stylesheet" href="{% static "boomerrang/bootstrap/bootstrap-datetimepicker.min.css" %}">
+      <link rel="stylesheet" href="{% static "boomerrang/css/styles.css" %}">
       <!-- Include CSS for our third-party telephone input jQuery plugin-->
       <script src="{% static "boomerrang/js/jquery-3.2.1.js" %}"></script>
       <script src="{% static "boomerrang/js/moment.js" %}"></script>
@@ -32,11 +32,7 @@
     <?php include_once("../../settings/analyticstracking.php") ?>
     <nav class="navbar navbar-default" id="header">
       <div class="container" >
-        <div class="card">
-          <div class="card-body">
-            <h2 class="card-title">Boomerrang</h2>
-            <p class="card-text">Call to Action on Your Terms<br>
-        </div>
+          <img src="{% static "boomerrang/images/logo.png" %}">
       </div>
     </nav>
     <div class="container">
@@ -46,21 +42,24 @@
           {% for message in messages %}
             <div class="alert alert-{{ message.tags }}">{{ message }}</div>
           {% endfor %}
+          <h1 class="color--accent">Call Senator Kamala Harris to talk about gun control in the U.S.</h1>
+          <p class="container--text">Senator Harris has spoken repeatedly about the need for tighter gun control in the United States. Please call to voice your support for her position and specifically to voice support and dissent for upcoming gun control legislation.</p>
+          <div class="card">
+            <div class="card-header">
+              <h4>Here's a suggested script:</h4>
+            </div>
+            <div class="card-body">
+              <p>"Hello. My name is ______________,</p>
+              <p>and I live in ______________, California.</p>
+              <p>I'm calling today to discuss the matter of gun control.</p>
+              <p>I know that Senator Harris has spoken repeatedly about the need for tighter gun control in the United States.</p>
+              <p>I wanted to call today to express my support for her position, and to ask her to support <a href="https://www.congress.gov/bill/115th-congress/senate-bill/1324" target="_blank">Senate Bill 1324 (the Disarm Hate Act)</a>, and <a href="https://www.congress.gov/bill/115th-congress/senate-bill/1185" target="_blank">Senate Bill 1185 (Stop Illegal Trafficking in Firearms Act of 2017)</a>. I'd also like to ask her to oppose <a href="https://www.congress.gov/bill/115th-congress/senate-bill/446" target="_blank">Senate Bill 446 (the Constitutional Concealed Carry Reciprocity Act of 2017)</a>.</p>
+              <p>Thank you for speaking with me today."</p>
+            </div>
+          </div>
+          <h3 class="color--accent">Enter your phone number below to schedule a call with Senator Harris' San Francisco office.</h3>
           <form id="contactForm" class="form-horizontal" role="form" action="/" method="post">
             {% csrf_token %}
-            <div class="form-group">
-              <h3>Call Senator Kamala Harris to talk about gun control in the U.S.</h3>
-              <p class="help-block">Senator Harris has spoken repeatedly about the need for tighter gun control in the United States.</p>
-              <p class="help-block">Please call to voice your support for her position and specifically to voice support and dissent for upcoming gun control legislation.</p>
-              <h4>Here's a suggested script:</h4>
-              <div class="well">
-                <p>"Hello. My name is ______________, and I live in ______________, California. I'm calling today to discuss the matter of gun control.</p>
-                <p>I know that Senator Harris has spoken repeatedly about the need for tighter gun control in the United States.</p>
-                <p>I wanted to call today to express my support for her position, and to ask her to support <a href="https://www.congress.gov/bill/115th-congress/senate-bill/1324" target="_blank">Senate Bill 1324 (the Disarm Hate Act)</a>, and <a href="https://www.congress.gov/bill/115th-congress/senate-bill/1185" target="_blank">Senate Bill 1185 (Stop Illegal Trafficking in Firearms Act of 2017)</a>. I'd also like to ask her to oppose <a href="https://www.congress.gov/bill/115th-congress/senate-bill/446" target="_blank">Senate Bill 446 (the Constitutional Concealed Carry Reciprocity Act of 2017)</a>.</p>
-                <p>Thank you for speaking with me today."</p>
-              </div>
-              <p class="help-block">Enter your phone number below to schedule a call with Senator Harris' San Francisco office.</p>
-            </div>
             {{ form|bootstrap_horizontal }}
             <div class="form-group pull-right">
               <input type="submit" name="schedule" class="btn btn-default" value="Schedule Call"/>
@@ -70,17 +69,13 @@
         </div>
       </div>
     </div>
-    <nav class="navbar navbar-default">
-      <div class="container" id="footer">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Truss: Infrastructuralists</h5>
-            <p class="card-text" >415.891.0828</p>
-            <p class="card-text">548 Market St #97444<br>
-            San Francisco CA 94104-5401<br>
-            Copyright © TrussWorks, Inc. 2016. All rights reserved.</p>
-          </div>
-        </div>
+    <nav class="navbar" id="footer">
+      <div class="container">
+        <h5>Truss: Infrastructuralists</h5>
+        <p>415.891.0828</p>
+        <p>548 Market St #97444<br>
+        San Francisco CA 94104-5401<br>
+        Copyright © TrussWorks, Inc. 2016. All rights reserved.</p>
       </div>
     </nav>
   </body>
