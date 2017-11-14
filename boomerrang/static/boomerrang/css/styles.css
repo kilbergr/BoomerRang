@@ -53,7 +53,20 @@ div.container {
 
 input[type="submit"] {
   background-color: #F1B256;
+  background-image: none;
+  border-color: #F1B256;
+  border-radius: 0px;
   color: white;
+  text-shadow: none;
+}
+
+input[type="tel"], #id_time_scheduled, span.input-group-addon {
+  border-radius: 0px
+}
+
+select#id_timezone.form-control {
+  border-bottom-left-radius: 0px;
+  border-radius: 0px;
 }
 
 /* Utility */
