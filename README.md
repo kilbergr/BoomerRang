@@ -9,7 +9,7 @@ BoomerRang is an API that advocacy organizations can use to connect citizens wit
  1. [pyenv](https://github.com/yyuu/pyenv#homebrew-on-mac-os-x)
  2. [pyenv virtualenv](https://github.com/yyuu/pyenv-virtualenv#installing-with-homebrew-for-os-x-users)
  3. [postgres](https://www.postgresql.org/download/macosx/): `brew install postgresql`
- 4. [ngrok](https://ngrok.com/): To install version 2 of ngrok, do NOT use homebrew. Instead, follow instructions from their site. We are using version [2.1.18](https://dl.equinox.io/ngrok/ngrok/stable/archive). Make sure to move the application from wherever you unzip it into `/usr/local/bin/ngrok`.
+ 4. [ngrok](https://ngrok.com/): To install version 2 of ngrok, do NOT use homebrew. Instead, follow instructions from their site. We are using version [2.1.18](https://dl.equinox.io/ngrok/ngrok/stable/archive). Make sure to move the application from wherever you unzip it into `/usr/local/bin/ngrok` and add it to your path.
 
 ## Virtualenv and Repo Setup:
 
