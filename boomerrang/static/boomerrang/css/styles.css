@@ -15,8 +15,17 @@
 
 /* Text */
 
+h1, h2, h3, h4, h5, p {
+  font-family: Verdana;
+  font-weight: bold;
+}
+
 h1 {
   font-size: 3em;
+}
+
+p {
+  color: #5A5A5A;
 }
 
 /* Containers */
@@ -96,6 +105,10 @@ select#id_timezone.form-control {
 
 .color--accent {
   color: #F1B256;
+}
+
+.color--white {
+  color: white;
 }
 
 .pull-right {
