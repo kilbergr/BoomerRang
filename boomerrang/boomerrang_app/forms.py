@@ -1,7 +1,9 @@
 from bootstrap3_datetime.widgets import DateTimePicker
 from django import forms
 from phonenumber_field.formfields import PhoneNumberField
-from timezone_field import TimeZoneFormField
+
+# TODO (rebecca): Add back in for TZ
+# from timezone_field import TimeZoneFormField
 
 
 class BoomForm(forms.Form):
@@ -16,7 +18,8 @@ class BoomForm(forms.Form):
                                        "minDate": "moment",
                                        # 5 minute increments
                                        "stepping": 5}))
-    timezone = TimeZoneFormField()
+    # TODO (rebecca): Add back in for TZ
+    # timezone = TimeZoneFormField()
     time_scheduled_utc = forms.DateTimeField(
         input_formats=['%Y-%m-%dT%H:%M:%S.%fZ'],
         widget=forms.HiddenInput())
@@ -29,4 +32,4 @@ class BoomForm(forms.Form):
         # TODO (rebecca): Remove below to allow editing once out of user research
         self.fields['target_num'].widget.attrs['readonly'] = "readonly"
         self.fields[
-            'time_scheduled'].label = "Call Time"
+            'time_scheduled'].label = "Call Time (PT)"
